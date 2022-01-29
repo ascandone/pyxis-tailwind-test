@@ -59,7 +59,7 @@ header text_ =
 
 view : Model -> Html Msg
 view _ =
-    div [ class "p-8 max-w-md antialiased space-y-6" ]
+    div [ class "p-8 max-w-md antialiased space-y-6 mb-24" ]
         [ header "Default"
         , TextField.view
             [ TextField.value "Input Text"
