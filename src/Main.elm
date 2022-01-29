@@ -53,7 +53,7 @@ subscriptions _ =
 
 header : String -> Html msg
 header text_ =
-    Html.h3 [ Html.Attributes.class "pt-2 font-semibold text-xl text-gray-900" ] [ Html.text text_ ]
+    Html.h3 [ Html.Attributes.class "pt-3 font-semibold text-3xl text-gray-900 font-serif" ] [ Html.text text_ ]
 
 
 view : Model -> Html Msg

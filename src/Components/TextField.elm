@@ -316,17 +316,14 @@ viewLabel size_ label_ =
 viewInput : Config msg -> Html msg
 viewInput config =
     Utils.concatArgs Html.input
-        [ [ class """
-                w-full rounded-lg bg-transparent
-                outline-none
-                """
+        [ [ class "w-full rounded-lg bg-transparent outline-none leading-none"
           , class <|
                 case config.size of
                     Medium ->
                         "px-4 py-4"
 
                     Small ->
-                        "px-2 py-2"
+                        "px-3 py-2"
           , Html.Attributes.disabled config.disabled
           ]
         , config.inputAttributes
@@ -383,13 +380,13 @@ viewAddon config { type_, placement } =
                 , class <|
                     case ( placement, config.size ) of
                         ( Leading, Small ) ->
-                            "pl-2"
+                            "pl-3"
 
                         ( Leading, Medium ) ->
                             "pl-4"
 
                         ( Trailing, Small ) ->
-                            "pr-2"
+                            "pr-3"
 
                         ( Trailing, Medium ) ->
                             "pr-4"
