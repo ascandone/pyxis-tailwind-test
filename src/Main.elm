@@ -1,6 +1,7 @@
 module Main exposing (main)
 
 import Browser
+import Components.TextArea as TextArea
 import Components.TextField as TextField
 import Html exposing (..)
 import Html.Attributes exposing (class)
@@ -67,5 +68,9 @@ view _ =
         , TextField.view
             [ TextField.disabled True
             , TextField.placeholder "Input Text"
+            ]
+        , hr [] []
+        , TextArea.view
+            [ TextArea.value "Input Text 2"
             ]
         ]

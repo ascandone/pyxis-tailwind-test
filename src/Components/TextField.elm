@@ -1,17 +1,25 @@
 module Components.TextField exposing
-    ( Attribute
+    ( AddonPlacement
+    , Attribute
     , Size
+    , addon
     , disabled
+    , iconAddon
+    , leading
     , medium
     , onInput
     , placeholder
     , size
     , small
+    , textAddon
+    , trailing
     , validation
     , value
     , view
     )
 
+import Components.Internal as Internal
+import FeatherIcons
 import Html exposing (Html)
 import Html.Attributes exposing (class)
 import Html.Events
@@ -27,6 +35,7 @@ type alias Config msg =
     , size : Size
     , validation : Result String ()
     , disabled : Bool
+    , addon : Maybe Addon
     }
 
 
@@ -36,6 +45,7 @@ defaultConfig =
     , size = Medium
     , validation = Ok ()
     , disabled = False
+    , addon = Nothing
     }
 
 
@@ -84,6 +94,47 @@ disabled disabled_ =
     Attribute <| \c -> { c | disabled = disabled_ }
 
 
+type AddonPlacement
+    = Trailing
+    | Leading
+
+
+trailing : AddonPlacement
+trailing =
+    Trailing
+
+
+leading : AddonPlacement
+leading =
+    Leading
+
+
+type AddonType
+    = IconAddon FeatherIcons.Icon
+    | TextAddon String
+
+
+iconAddon : FeatherIcons.Icon -> AddonType
+iconAddon =
+    IconAddon
+
+
+textAddon : String -> AddonType
+textAddon =
+    TextAddon
+
+
+type alias Addon =
+    { placement : AddonPlacement
+    , type_ : AddonType
+    }
+
+
+addon : AddonPlacement -> AddonType -> Attribute msg
+addon placement type_ =
+    Attribute <| \c -> { c | addon = Just { placement = placement, type_ = type_ } }
+
+
 
 -- Events
 
@@ -112,22 +163,7 @@ view attrs =
             makeConfig attrs
     in
     Html.div []
-        [ Html.div
-            [ class """
-            border-2 rounded-lg leading-none
-            transition-all duration-200 ease-in-out
-            """
-            , class <|
-                case ( config.validation, config.disabled ) of
-                    ( _, True ) ->
-                        "bg-neutral-100 border-neutral-200 placeholder:text-neutral-400"
-
-                    ( Ok (), _ ) ->
-                        "focus-within:border-cyan-600 hover:border-cyan-600 focus-within:ring ring-cyan-200 text-gray-900"
-
-                    ( Err _, _ ) ->
-                        "border-red-500  focus-within:ring ring-red-200 text-red-800 placeholder:text-red-200"
-            ]
+        [ Html.div [ Internal.formFieldClass config ]
             [ Utils.concatArgs Html.input
                 [ [ class """
                 w-full rounded-lg bg-transparent
