@@ -231,7 +231,14 @@ viewAddon config { type_, placement } =
     case type_ of
         TextAddon text_ ->
             Html.div
-                [ class "transition-color px-4 flex items-center"
+                [ class "transition-color flex items-center"
+                , class <|
+                    case config.size of
+                        Small ->
+                            "px-3"
+
+                        Medium ->
+                            "px-4"
                 , commonCls
                 , class Internal.formFieldTransitionClass
                 , class <|
@@ -249,13 +256,30 @@ viewAddon config { type_, placement } =
             Html.span
                 [ class "flex items-center"
                 , class <|
-                    case placement of
-                        Leading ->
+                    case ( placement, config.size ) of
+                        ( Leading, Small ) ->
+                            "pl-2"
+
+                        ( Leading, Medium ) ->
                             "pl-4"
 
-                        Trailing ->
+                        ( Trailing, Small ) ->
+                            "pr-2"
+
+                        ( Trailing, Medium ) ->
                             "pr-4"
                 , commonCls
                 ]
-                [ FeatherIcons.toHtml [ class "fill-current" ] icon
+                [ icon
+                    |> FeatherIcons.withSize
+                        (case config.size of
+                            Small ->
+                                18
+
+                            Medium ->
+                                22
+                        )
+                    |> FeatherIcons.toHtml
+                        [ class "fill-current"
+                        ]
                 ]
