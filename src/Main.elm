@@ -181,4 +181,20 @@ view _ =
             [ TextArea.placeholder "Input Text"
             , TextArea.disabled True
             ]
+        , TextArea.view
+            [ TextArea.placeholder "Input Text"
+            , TextArea.label Label.horizontal (Label.single "Label")
+            ]
+        , TextArea.view
+            [ TextArea.placeholder "Input Text"
+            , TextArea.label Label.horizontal (Label.double "Label" "Second label")
+            ]
+        , TextArea.view
+            [ TextArea.placeholder "Input Text"
+            , TextArea.label Label.vertical (Label.single "Label")
+            ]
+        , TextArea.view
+            [ TextArea.placeholder "Input Text"
+            , TextArea.label Label.vertical (Label.double "Label" "Second label")
+            ]
         ]

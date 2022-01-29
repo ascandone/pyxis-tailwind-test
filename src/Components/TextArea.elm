@@ -15,7 +15,7 @@ import Components.Internal as Internal
 import Components.Label as Label
 import Components.Label.Internal as LabelInternal
 import Html exposing (Html)
-import Html.Attributes
+import Html.Attributes exposing (class)
 import Html.Events
 import Html.Extra as Html
 import Utils
@@ -121,13 +121,24 @@ view attrs =
         config =
             makeConfig attrs
     in
-    Html.div []
+    Html.div
+        [ class <|
+            case Maybe.map .position config.label of
+                Nothing ->
+                    ""
+
+                Just LabelInternal.Vertical ->
+                    "flex flex-col"
+
+                Just LabelInternal.Horizontal ->
+                    "flex"
+        ]
         [ Html.viewMaybe (viewLabel config) config.label
         , Html.div
             [ Internal.formFieldClass config
             ]
             [ Utils.concatArgs Html.textarea
-                [ [ Html.Attributes.class "px-3 py-3 w-full focus:outline-none rounded-lg"
+                [ [ class "px-3 py-3 w-full focus:outline-none rounded-lg"
                   , Html.Attributes.disabled config.disabled
                   ]
                 , config.textFieldAttributes
