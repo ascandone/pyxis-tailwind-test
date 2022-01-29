@@ -80,6 +80,7 @@ view _ =
         , TextField.view
             [ TextField.placeholder "Input Text"
             , TextField.label TextField.vertical (TextField.single "Label")
+            , TextField.id "item-id"
             ]
         , TextField.view
             [ TextField.placeholder "Input Text"

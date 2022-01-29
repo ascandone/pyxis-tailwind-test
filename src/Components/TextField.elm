@@ -9,6 +9,7 @@ module Components.TextField exposing
     , double
     , horizontal
     , iconAddon
+    , id
     , label
     , leading
     , medium
@@ -30,6 +31,7 @@ import FeatherIcons
 import Html exposing (Html)
 import Html.Attributes exposing (class, classList)
 import Html.Events
+import Maybe.Extra as Maybe
 import Utils
 
 
@@ -44,6 +46,7 @@ type alias Config msg =
     , disabled : Bool
     , addon : Maybe Addon
     , label : Maybe Label
+    , id : Maybe String
     }
 
 
@@ -55,7 +58,13 @@ defaultConfig =
     , disabled = False
     , addon = Nothing
     , label = Nothing
+    , id = Nothing
     }
+
+
+id : String -> Attribute msg
+id id_ =
+    Attribute <| \c -> { c | id = Just id_ }
 
 
 inputAttribute : Html.Attribute msg -> Attribute msg
@@ -246,7 +255,7 @@ view attrs =
                     Html.text ""
 
                 Just label_ ->
-                    viewLabel config.size label_
+                    viewLabel config label_
             , Html.div [ Internal.formFieldClass config ] <|
                 case config.addon of
                     Nothing ->
@@ -273,28 +282,30 @@ view attrs =
         ]
 
 
-viewLabel : Size -> Label -> Html msg
-viewLabel size_ label_ =
-    Html.div
-        [ classList
-            [ ( "flex flex-col gap-x-2 leading-none", True )
-            , ( "justify-center items-end", label_.position == Horizontal )
-            ]
-        , class <|
-            case ( label_.position, size_ ) of
-                ( Vertical, Small ) ->
-                    "mb-1"
+viewLabel : { r | size : Size, id : Maybe String } -> Label -> Html msg
+viewLabel config label_ =
+    Utils.concatArgs Html.label
+        [ [ classList
+                [ ( "flex flex-col gap-x-2 leading-none", True )
+                , ( "justify-center items-end", label_.position == Horizontal )
+                ]
+          , class <|
+                case ( label_.position, config.size ) of
+                    ( Vertical, Small ) ->
+                        "mb-1"
 
-                ( Vertical, Medium ) ->
-                    "mb-2"
+                    ( Vertical, Medium ) ->
+                        "mb-2"
 
-                ( Horizontal, _ ) ->
-                    "justify-center items-end mr-3"
+                    ( Horizontal, _ ) ->
+                        "justify-center items-end mr-3"
+          ]
+        , Maybe.mapToList Html.Attributes.for config.id
         ]
         [ Html.span
             [ class "text-gray-800 font-medium"
             , class <|
-                case size_ of
+                case config.size of
                     Small ->
                         "text-base"
 
@@ -327,6 +338,7 @@ viewInput config =
           , Html.Attributes.disabled config.disabled
           ]
         , config.inputAttributes
+        , Maybe.mapToList Html.Attributes.id config.id
         ]
         []
 
