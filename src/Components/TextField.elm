@@ -27,6 +27,7 @@ import FeatherIcons
 import Html exposing (Html)
 import Html.Attributes exposing (class)
 import Html.Events
+import Html.Extra as Html
 import Maybe.Extra as Maybe
 import Utils
 
@@ -209,12 +210,7 @@ view attrs =
                     Just LabelInternal.Horizontal ->
                         "flex"
             ]
-            [ case config.label of
-                Nothing ->
-                    Html.text ""
-
-                Just label_ ->
-                    viewLabel config label_
+            [ Html.viewMaybe (viewLabel config) config.label
             , Html.div [ Internal.formFieldClass config ] <|
                 case config.addon of
                     Nothing ->

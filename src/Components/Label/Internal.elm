@@ -10,6 +10,7 @@ module Components.Label.Internal exposing
 
 import Html exposing (Html)
 import Html.Attributes exposing (class, classList)
+import Html.Extra as Html
 import Maybe.Extra as Maybe
 import Utils
 
@@ -78,11 +79,6 @@ view config =
             ]
             [ Html.text config.label.label ]
         , Html.span [ class "text-gray-500 text-sm font-medium" ]
-            [ case config.label.secondaryLabel of
-                Nothing ->
-                    Html.text ""
-
-                Just secondaryLabel ->
-                    Html.text secondaryLabel
+            [ Html.viewMaybe Html.text config.label.secondaryLabel
             ]
         ]
