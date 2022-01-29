@@ -1,6 +1,7 @@
 module Main exposing (main)
 
 import Browser
+import Components.Label as Label
 import Components.TextArea as TextArea
 import Components.TextField as TextField
 import FeatherIcons
@@ -79,41 +80,41 @@ view _ =
         , header "Labeled"
         , TextField.view
             [ TextField.placeholder "Input Text"
-            , TextField.label TextField.vertical (TextField.single "Label")
+            , TextField.label Label.vertical (Label.single "Label")
             , TextField.id "item-id"
             ]
         , TextField.view
             [ TextField.placeholder "Input Text"
-            , TextField.label TextField.vertical (TextField.double "Label" "Second label")
+            , TextField.label Label.vertical (Label.double "Label" "Second label")
             ]
         , TextField.view
             [ TextField.placeholder "Input Text"
-            , TextField.label TextField.horizontal (TextField.single "Label")
+            , TextField.label Label.horizontal (Label.single "Label")
             ]
         , TextField.view
             [ TextField.placeholder "Input Text"
-            , TextField.label TextField.horizontal (TextField.double "Label" "Second label")
+            , TextField.label Label.horizontal (Label.double "Label" "Second label")
             ]
 
         -- Small
         , TextField.view
             [ TextField.placeholder "Input Text"
-            , TextField.label TextField.vertical (TextField.single "Label")
+            , TextField.label Label.vertical (Label.single "Label")
             , TextField.size TextField.small
             ]
         , TextField.view
             [ TextField.placeholder "Input Text"
-            , TextField.label TextField.vertical (TextField.double "Label" "Second label")
+            , TextField.label Label.vertical (Label.double "Label" "Second label")
             , TextField.size TextField.small
             ]
         , TextField.view
             [ TextField.placeholder "Input Text"
-            , TextField.label TextField.horizontal (TextField.single "Label")
+            , TextField.label Label.horizontal (Label.single "Label")
             , TextField.size TextField.small
             ]
         , TextField.view
             [ TextField.placeholder "Input Text"
-            , TextField.label TextField.horizontal (TextField.double "Label" "Second label")
+            , TextField.label Label.horizontal (Label.double "Label" "Second label")
             , TextField.size TextField.small
             ]
         , header "Text addon"

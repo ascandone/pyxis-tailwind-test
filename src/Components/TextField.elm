@@ -1,13 +1,9 @@
 module Components.TextField exposing
     ( AddonPlacement
     , Attribute
-    , LabelPosition
-    , LabelType
     , Size
     , addon
     , disabled
-    , double
-    , horizontal
     , iconAddon
     , id
     , label
@@ -15,18 +11,18 @@ module Components.TextField exposing
     , medium
     , onInput
     , placeholder
-    , single
     , size
     , small
     , textAddon
     , trailing
     , validation
     , value
-    , vertical
     , view
     )
 
 import Components.Internal as Internal
+import Components.Label as Label
+import Components.Label.Internal as LabelInternal
 import FeatherIcons
 import Html exposing (Html)
 import Html.Attributes exposing (class, classList)
@@ -45,7 +41,7 @@ type alias Config msg =
     , validation : Result String ()
     , disabled : Bool
     , addon : Maybe Addon
-    , label : Maybe Label
+    , label : Maybe LabelInternal.Label
     , id : Maybe String
     }
 
@@ -153,55 +149,18 @@ addon placement type_ =
     Attribute <| \c -> { c | addon = Just { placement = placement, type_ = type_ } }
 
 
-type alias Label =
-    { position : LabelPosition
-    , label : String
-    , secondaryLabel : Maybe String
-    }
-
-
-type LabelPosition
-    = Vertical
-    | Horizontal
-
-
-vertical : LabelPosition
-vertical =
-    Vertical
-
-
-horizontal : LabelPosition
-horizontal =
-    Horizontal
-
-
-type LabelType
-    = Single String
-    | Double String String
-
-
-single : String -> LabelType
-single =
-    Single
-
-
-double : String -> String -> LabelType
-double =
-    Double
-
-
-label : LabelPosition -> LabelType -> Attribute msg
+label : Label.Position -> Label.Type -> Attribute msg
 label position type_ =
     let
         label_ =
             case type_ of
-                Single l1 ->
+                LabelInternal.Single l1 ->
                     { position = position
                     , label = l1
                     , secondaryLabel = Nothing
                     }
 
-                Double l1 l2 ->
+                LabelInternal.Double l1 l2 ->
                     { position = position
                     , label = l1
                     , secondaryLabel = Just l2
@@ -244,10 +203,10 @@ view attrs =
                     Nothing ->
                         ""
 
-                    Just Vertical ->
+                    Just LabelInternal.Vertical ->
                         "flex flex-col"
 
-                    Just Horizontal ->
+                    Just LabelInternal.Horizontal ->
                         "flex"
             ]
             [ case config.label of
@@ -282,22 +241,22 @@ view attrs =
         ]
 
 
-viewLabel : { r | size : Size, id : Maybe String } -> Label -> Html msg
+viewLabel : { r | size : Size, id : Maybe String } -> LabelInternal.Label -> Html msg
 viewLabel config label_ =
     Utils.concatArgs Html.label
         [ [ classList
                 [ ( "flex flex-col gap-x-2 leading-none", True )
-                , ( "justify-center items-end", label_.position == Horizontal )
+                , ( "justify-center items-end", label_.position == LabelInternal.Horizontal )
                 ]
           , class <|
                 case ( label_.position, config.size ) of
-                    ( Vertical, Small ) ->
+                    ( LabelInternal.Vertical, Small ) ->
                         "mb-1"
 
-                    ( Vertical, Medium ) ->
+                    ( LabelInternal.Vertical, Medium ) ->
                         "mb-2"
 
-                    ( Horizontal, _ ) ->
+                    ( LabelInternal.Horizontal, _ ) ->
                         "justify-center items-end mr-3"
           ]
         , Maybe.mapToList Html.Attributes.for config.id
