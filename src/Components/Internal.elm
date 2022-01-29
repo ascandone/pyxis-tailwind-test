@@ -1,13 +1,19 @@
-module Components.Internal exposing (formFieldClass)
+module Components.Internal exposing (formFieldClass, formFieldTransitionClass)
 
 import Html exposing (Attribute)
 import Html.Attributes exposing (classList)
 
 
+formFieldTransitionClass : String
+formFieldTransitionClass =
+    "duration-200 ease-in-out"
+
+
 formFieldClass : { r | validation : Result error (), disabled : Bool } -> Attribute msg
 formFieldClass { validation, disabled } =
     classList
-        [ ( "border-2 rounded-lg leading-none transition-all duration-200 ease-in-out", True )
+        [ ( "group flex border-2 rounded-lg leading-none transition-all", True )
+        , ( formFieldTransitionClass, True )
         , ( case ( validation, disabled ) of
                 ( _, True ) ->
                     "bg-neutral-100 border-neutral-200 placeholder:text-neutral-400"

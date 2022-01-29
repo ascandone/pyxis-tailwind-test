@@ -3,6 +3,7 @@ module Main exposing (main)
 import Browser
 import Components.TextArea as TextArea
 import Components.TextField as TextField
+import FeatherIcons
 import Html exposing (..)
 import Html.Attributes exposing (class)
 
@@ -50,6 +51,11 @@ subscriptions _ =
     Sub.none
 
 
+header : String -> Html msg
+header text_ =
+    Html.h3 [ Html.Attributes.class "pt-2 font-semibold text-lg text-gray-900" ] [ Html.text text_ ]
+
+
 view : Model -> Html Msg
 view _ =
     div [ class "p-8 max-w-md antialiased space-y-4" ]
@@ -69,7 +75,55 @@ view _ =
             [ TextField.disabled True
             , TextField.placeholder "Input Text"
             ]
-        , hr [] []
+        , header "Text addon"
+        , TextField.view
+            [ TextField.placeholder "Input Text"
+            , TextField.addon TextField.leading (TextField.textAddon "€")
+            ]
+        , TextField.view
+            [ TextField.placeholder "Input Text"
+            , TextField.addon TextField.trailing (TextField.textAddon "€")
+            ]
+        , TextField.view
+            [ TextField.placeholder "Input Text"
+            , TextField.size TextField.small
+            , TextField.addon TextField.leading (TextField.textAddon "€")
+            ]
+        , TextField.view
+            [ TextField.placeholder "Input Text"
+            , TextField.size TextField.small
+            , TextField.addon TextField.trailing (TextField.textAddon "€")
+            ]
+        , TextField.view
+            [ TextField.placeholder "Input Text"
+            , TextField.validation (Err "Error message")
+            , TextField.addon TextField.trailing (TextField.textAddon "€")
+            ]
+        , TextField.view
+            [ TextField.placeholder "Input Text"
+            , TextField.disabled True
+            , TextField.addon TextField.trailing (TextField.textAddon "€")
+            ]
+        , header "Icon addon"
+        , TextField.view
+            [ TextField.placeholder "Input Text"
+            , TextField.addon TextField.leading (TextField.iconAddon FeatherIcons.link)
+            ]
+        , TextField.view
+            [ TextField.placeholder "Input Text"
+            , TextField.addon TextField.trailing (TextField.iconAddon FeatherIcons.link)
+            ]
+        , TextField.view
+            [ TextField.placeholder "Input Text"
+            , TextField.addon TextField.leading (TextField.iconAddon FeatherIcons.link)
+            , TextField.validation (Err "Error message")
+            ]
+        , TextField.view
+            [ TextField.placeholder "Input Text"
+            , TextField.addon TextField.leading (TextField.iconAddon FeatherIcons.link)
+            , TextField.disabled True
+            ]
+        , header "Textarea"
         , TextArea.view
             [ TextArea.value "Input Text 2"
             ]
