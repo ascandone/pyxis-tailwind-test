@@ -1,10 +1,12 @@
 module Components.Label.Internal exposing
     ( Label
-    , Position(..)
+    , Position
     , Size
     , Type(..)
+    , horizontal
     , medium
     , small
+    , vertical
     , view
     )
 
@@ -27,6 +29,16 @@ type Position
     | Horizontal
 
 
+vertical : Position
+vertical =
+    Vertical
+
+
+horizontal : Position
+horizontal =
+    Horizontal
+
+
 type Type
     = Single String
     | Double String String
@@ -47,15 +59,15 @@ medium =
     Medium
 
 
-view : { size : Size, id : Maybe String, label : Label } -> Html msg
-view config =
-    Utils.concatArgs Html.label
+viewLabelText : { r | size : Size, id : Maybe String } -> Label -> Html msg
+viewLabelText config label_ =
+    Utils.concatArgs Html.span
         [ [ classList
                 [ ( "flex flex-col gap-x-2 leading-none", True )
-                , ( "justify-center items-end", config.label.position == Horizontal )
+                , ( "justify-center items-end", label_.position == Horizontal )
                 ]
           , class <|
-                case ( config.label.position, config.size ) of
+                case ( label_.position, config.size ) of
                     ( Vertical, Small ) ->
                         "mb-1"
 
@@ -77,8 +89,29 @@ view config =
                     Medium ->
                         "text-lg"
             ]
-            [ Html.text config.label.label ]
+            [ Html.text label_.label ]
         , Html.span [ class "text-gray-500 text-sm font-medium" ]
-            [ Html.viewMaybe Html.text config.label.secondaryLabel
+            [ Html.viewMaybe Html.text label_.secondaryLabel
             ]
         ]
+
+
+view : { size : Size, id : Maybe String, label : Maybe Label } -> Html msg -> Html msg
+view args child =
+    case args.label of
+        Nothing ->
+            child
+
+        Just label_ ->
+            Html.label
+                [ class <|
+                    case label_.position of
+                        Vertical ->
+                            "flex flex-col"
+
+                        Horizontal ->
+                            "flex"
+                ]
+                [ viewLabelText args label_
+                , child
+                ]

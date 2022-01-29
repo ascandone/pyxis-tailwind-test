@@ -198,20 +198,18 @@ view attrs =
             makeConfig attrs
     in
     Html.div []
-        [ Html.div
-            [ class <|
-                case Maybe.map .position config.label of
-                    Nothing ->
-                        ""
+        [ LabelInternal.view
+            { size =
+                case config.size of
+                    Small ->
+                        LabelInternal.small
 
-                    Just LabelInternal.Vertical ->
-                        "flex flex-col"
-
-                    Just LabelInternal.Horizontal ->
-                        "flex"
-            ]
-            [ Html.viewMaybe (viewLabel config) config.label
-            , Html.div [ Internal.formFieldClass config ] <|
+                    Medium ->
+                        LabelInternal.medium
+            , id = config.id
+            , label = config.label
+            }
+            (Html.div [ Internal.formFieldClass config ] <|
                 case config.addon of
                     Nothing ->
                         [ viewInput config ]
@@ -227,24 +225,9 @@ view attrs =
                                 [ viewInput config
                                 , viewAddon config addon_
                                 ]
-            ]
+            )
         , Internal.viewValidationMessage config.validation
         ]
-
-
-viewLabel : { r | size : Size, id : Maybe String } -> LabelInternal.Label -> Html msg
-viewLabel config label_ =
-    LabelInternal.view
-        { size =
-            case config.size of
-                Small ->
-                    LabelInternal.small
-
-                Medium ->
-                    LabelInternal.medium
-        , id = config.id
-        , label = label_
-        }
 
 
 viewInput : Config msg -> Html msg

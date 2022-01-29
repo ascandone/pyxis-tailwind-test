@@ -14,16 +14,6 @@ type alias Position =
     Internal.Position
 
 
-vertical : Position
-vertical =
-    Internal.Vertical
-
-
-horizontal : Position
-horizontal =
-    Internal.Horizontal
-
-
 type alias Type =
     Internal.Type
 
@@ -36,3 +26,13 @@ single =
 double : String -> String -> Type
 double =
     Internal.Double
+
+
+horizontal : Position
+horizontal =
+    Internal.horizontal
+
+
+vertical : Position
+vertical =
+    Internal.vertical
