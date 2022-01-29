@@ -25,7 +25,7 @@ import Components.Label as Label
 import Components.Label.Internal as LabelInternal
 import FeatherIcons
 import Html exposing (Html)
-import Html.Attributes exposing (class, classList)
+import Html.Attributes exposing (class)
 import Html.Events
 import Maybe.Extra as Maybe
 import Utils
@@ -243,44 +243,17 @@ view attrs =
 
 viewLabel : { r | size : Size, id : Maybe String } -> LabelInternal.Label -> Html msg
 viewLabel config label_ =
-    Utils.concatArgs Html.label
-        [ [ classList
-                [ ( "flex flex-col gap-x-2 leading-none", True )
-                , ( "justify-center items-end", label_.position == LabelInternal.Horizontal )
-                ]
-          , class <|
-                case ( label_.position, config.size ) of
-                    ( LabelInternal.Vertical, Small ) ->
-                        "mb-1"
+    LabelInternal.view
+        { size =
+            case config.size of
+                Small ->
+                    LabelInternal.small
 
-                    ( LabelInternal.Vertical, Medium ) ->
-                        "mb-2"
-
-                    ( LabelInternal.Horizontal, _ ) ->
-                        "justify-center items-end mr-3"
-          ]
-        , Maybe.mapToList Html.Attributes.for config.id
-        ]
-        [ Html.span
-            [ class "text-gray-800 font-medium"
-            , class <|
-                case config.size of
-                    Small ->
-                        "text-base"
-
-                    Medium ->
-                        "text-lg"
-            ]
-            [ Html.text label_.label ]
-        , Html.span [ class "text-gray-500 text-sm font-medium" ]
-            [ case label_.secondaryLabel of
-                Nothing ->
-                    Html.text ""
-
-                Just secondaryLabel ->
-                    Html.text secondaryLabel
-            ]
-        ]
+                Medium ->
+                    LabelInternal.medium
+        , id = config.id
+        , label = label_
+        }
 
 
 viewInput : Config msg -> Html msg
