@@ -53,16 +53,13 @@ subscriptions _ =
 
 header : String -> Html msg
 header text_ =
-    Html.h3 [ Html.Attributes.class "pt-2 font-semibold text-lg text-gray-900" ] [ Html.text text_ ]
+    Html.h3 [ Html.Attributes.class "pt-2 font-semibold text-xl text-gray-900" ] [ Html.text text_ ]
 
 
 view : Model -> Html Msg
 view _ =
-    div [ class "p-8 max-w-md antialiased space-y-4" ]
-        [ TextField.view
-            [ TextField.placeholder "Input Text"
-            , TextField.size TextField.small
-            ]
+    div [ class "p-8 max-w-md antialiased space-y-6" ]
+        [ header "Default"
         , TextField.view
             [ TextField.value "Input Text"
             , TextField.placeholder "Input Text"
@@ -74,6 +71,49 @@ view _ =
         , TextField.view
             [ TextField.disabled True
             , TextField.placeholder "Input Text"
+            ]
+        , TextField.view
+            [ TextField.placeholder "Input Text"
+            , TextField.size TextField.small
+            ]
+        , header "Labeled"
+        , TextField.view
+            [ TextField.placeholder "Input Text"
+            , TextField.label TextField.vertical (TextField.single "Label")
+            ]
+        , TextField.view
+            [ TextField.placeholder "Input Text"
+            , TextField.label TextField.vertical (TextField.double "Label" "Second label")
+            ]
+        , TextField.view
+            [ TextField.placeholder "Input Text"
+            , TextField.label TextField.horizontal (TextField.single "Label")
+            ]
+        , TextField.view
+            [ TextField.placeholder "Input Text"
+            , TextField.label TextField.horizontal (TextField.double "Label" "Second label")
+            ]
+
+        -- Small
+        , TextField.view
+            [ TextField.placeholder "Input Text"
+            , TextField.label TextField.vertical (TextField.single "Label")
+            , TextField.size TextField.small
+            ]
+        , TextField.view
+            [ TextField.placeholder "Input Text"
+            , TextField.label TextField.vertical (TextField.double "Label" "Second label")
+            , TextField.size TextField.small
+            ]
+        , TextField.view
+            [ TextField.placeholder "Input Text"
+            , TextField.label TextField.horizontal (TextField.single "Label")
+            , TextField.size TextField.small
+            ]
+        , TextField.view
+            [ TextField.placeholder "Input Text"
+            , TextField.label TextField.horizontal (TextField.double "Label" "Second label")
+            , TextField.size TextField.small
             ]
         , header "Text addon"
         , TextField.view

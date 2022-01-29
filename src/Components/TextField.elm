@@ -1,27 +1,34 @@
 module Components.TextField exposing
     ( AddonPlacement
     , Attribute
+    , LabelPosition
+    , LabelType
     , Size
     , addon
     , disabled
+    , double
+    , horizontal
     , iconAddon
+    , label
     , leading
     , medium
     , onInput
     , placeholder
+    , single
     , size
     , small
     , textAddon
     , trailing
     , validation
     , value
+    , vertical
     , view
     )
 
 import Components.Internal as Internal
 import FeatherIcons
 import Html exposing (Html)
-import Html.Attributes exposing (class)
+import Html.Attributes exposing (class, classList)
 import Html.Events
 import Utils
 
@@ -36,6 +43,7 @@ type alias Config msg =
     , validation : Result String ()
     , disabled : Bool
     , addon : Maybe Addon
+    , label : Maybe Label
     }
 
 
@@ -46,6 +54,7 @@ defaultConfig =
     , validation = Ok ()
     , disabled = False
     , addon = Nothing
+    , label = Nothing
     }
 
 
@@ -135,6 +144,63 @@ addon placement type_ =
     Attribute <| \c -> { c | addon = Just { placement = placement, type_ = type_ } }
 
 
+type alias Label =
+    { position : LabelPosition
+    , label : String
+    , secondaryLabel : Maybe String
+    }
+
+
+type LabelPosition
+    = Vertical
+    | Horizontal
+
+
+vertical : LabelPosition
+vertical =
+    Vertical
+
+
+horizontal : LabelPosition
+horizontal =
+    Horizontal
+
+
+type LabelType
+    = Single String
+    | Double String String
+
+
+single : String -> LabelType
+single =
+    Single
+
+
+double : String -> String -> LabelType
+double =
+    Double
+
+
+label : LabelPosition -> LabelType -> Attribute msg
+label position type_ =
+    let
+        label_ =
+            case type_ of
+                Single l1 ->
+                    { position = position
+                    , label = l1
+                    , secondaryLabel = Nothing
+                    }
+
+                Double l1 l2 ->
+                    { position = position
+                    , label = l1
+                    , secondaryLabel = Just l2
+                    }
+    in
+    Attribute <| \c -> { c | label = Just label_ }
+
+
 
 -- Events
 
@@ -163,28 +229,87 @@ view attrs =
             makeConfig attrs
     in
     Html.div []
-        [ Html.div [ Internal.formFieldClass config ] <|
-            case config.addon of
+        [ Html.div
+            [ class <|
+                case Maybe.map .position config.label of
+                    Nothing ->
+                        ""
+
+                    Just Vertical ->
+                        "flex flex-col"
+
+                    Just Horizontal ->
+                        "flex"
+            ]
+            [ case config.label of
                 Nothing ->
-                    [ viewInput config ]
+                    Html.text ""
 
-                Just addon_ ->
-                    case addon_.placement of
-                        Leading ->
-                            [ viewAddon config addon_
-                            , viewInput config
-                            ]
+                Just label_ ->
+                    viewLabel config.size label_
+            , Html.div [ Internal.formFieldClass config ] <|
+                case config.addon of
+                    Nothing ->
+                        [ viewInput config ]
 
-                        Trailing ->
-                            [ viewInput config
-                            , viewAddon config addon_
-                            ]
+                    Just addon_ ->
+                        case addon_.placement of
+                            Leading ->
+                                [ viewAddon config addon_
+                                , viewInput config
+                                ]
+
+                            Trailing ->
+                                [ viewInput config
+                                , viewAddon config addon_
+                                ]
+            ]
         , case config.validation of
             Ok () ->
                 Html.text ""
 
             Err validationMsg ->
                 Html.span [ class "text-xs text-red-800 font-medium" ] [ Html.text validationMsg ]
+        ]
+
+
+viewLabel : Size -> Label -> Html msg
+viewLabel size_ label_ =
+    Html.div
+        [ classList
+            [ ( "flex flex-col gap-x-2 leading-none", True )
+            , ( "justify-center items-end", label_.position == Horizontal )
+            ]
+        , class <|
+            case ( label_.position, size_ ) of
+                ( Vertical, Small ) ->
+                    "mb-1"
+
+                ( Vertical, Medium ) ->
+                    "mb-2"
+
+                ( Horizontal, _ ) ->
+                    "justify-center items-end mr-3"
+        ]
+        [ Html.span
+            [ class "text-gray-800 font-medium"
+            , class <|
+                case size_ of
+                    Small ->
+                        "text-base"
+
+                    Medium ->
+                        "text-lg"
+            ]
+            [ Html.text label_.label ]
+        , Html.span [ class "text-gray-500 text-sm font-medium" ]
+            [ case label_.secondaryLabel of
+                Nothing ->
+                    Html.text ""
+
+                Just secondaryLabel ->
+                    Html.text secondaryLabel
+            ]
         ]
 
 
