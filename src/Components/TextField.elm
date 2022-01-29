@@ -228,12 +228,7 @@ view attrs =
                                 , viewAddon config addon_
                                 ]
             ]
-        , case config.validation of
-            Ok () ->
-                Html.text ""
-
-            Err validationMsg ->
-                Html.span [ class "text-xs text-red-800 font-medium" ] [ Html.text validationMsg ]
+        , Internal.viewValidationMessage config.validation
         ]
 
 

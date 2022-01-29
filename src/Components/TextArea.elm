@@ -121,30 +121,33 @@ view attrs =
         config =
             makeConfig attrs
     in
-    Html.div
-        [ class <|
-            case Maybe.map .position config.label of
-                Nothing ->
-                    ""
+    Html.div []
+        [ Html.div
+            [ class <|
+                case Maybe.map .position config.label of
+                    Nothing ->
+                        ""
 
-                Just LabelInternal.Vertical ->
-                    "flex flex-col"
+                    Just LabelInternal.Vertical ->
+                        "flex flex-col"
 
-                Just LabelInternal.Horizontal ->
-                    "flex"
-        ]
-        [ Html.viewMaybe (viewLabel config) config.label
-        , Html.div
-            [ Internal.formFieldClass config
+                    Just LabelInternal.Horizontal ->
+                        "flex"
             ]
-            [ Utils.concatArgs Html.textarea
-                [ [ class "px-3 py-3 w-full focus:outline-none rounded-lg"
-                  , Html.Attributes.disabled config.disabled
-                  ]
-                , config.textFieldAttributes
+            [ Html.viewMaybe (viewLabel config) config.label
+            , Html.div
+                [ Internal.formFieldClass config
                 ]
-                []
+                [ Utils.concatArgs Html.textarea
+                    [ [ class "px-3 py-3 w-full focus:outline-none rounded-lg"
+                      , Html.Attributes.disabled config.disabled
+                      ]
+                    , config.textFieldAttributes
+                    ]
+                    []
+                ]
             ]
+        , Internal.viewValidationMessage config.validation
         ]
 
 

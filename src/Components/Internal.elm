@@ -1,7 +1,7 @@
-module Components.Internal exposing (formFieldClass, formFieldTransitionClass)
+module Components.Internal exposing (formFieldClass, formFieldTransitionClass, viewValidationMessage)
 
-import Html exposing (Attribute)
-import Html.Attributes exposing (classList)
+import Html exposing (Attribute, Html)
+import Html.Attributes exposing (class, classList)
 import Utils
 
 
@@ -36,3 +36,14 @@ formFieldClass { validation, disabled } =
           , True
           )
         ]
+
+
+viewValidationMessage : Result String () -> Html msg
+viewValidationMessage validation_ =
+    case validation_ of
+        Ok () ->
+            Html.text ""
+
+        Err validationMsg ->
+            Html.span [ class "text-xs text-red-800 font-medium" ]
+                [ Html.text validationMsg ]
