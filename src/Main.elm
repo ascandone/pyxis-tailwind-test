@@ -165,8 +165,20 @@ view _ =
             , TextField.addon TextField.leading (TextField.iconAddon FeatherIcons.link)
             , TextField.size TextField.small
             ]
+        , hr [] []
         , header "Textarea"
         , TextArea.view
-            [ TextArea.value "Input Text 2"
+            [ TextArea.placeholder "Input Text"
+            ]
+        , TextArea.view
+            [ TextArea.value "Input Text"
+            ]
+        , TextArea.view
+            [ TextArea.value "Input Text"
+            , TextArea.validation (Err "Error message")
+            ]
+        , TextArea.view
+            [ TextArea.placeholder "Input Text"
+            , TextArea.disabled True
             ]
         ]

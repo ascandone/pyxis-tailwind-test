@@ -1,8 +1,5 @@
 module Utils exposing (concatArgs, getMakeConfig, stateClass)
 
-import Html exposing (Attribute)
-import Html.Attributes
-
 
 getMakeConfig :
     { unwrap : attribute -> config -> config
@@ -27,15 +24,14 @@ stateClass :
         , error : String
         , default : String
         }
-    -> Attribute msg
+    -> String
 stateClass validation disabled cls =
-    Html.Attributes.class <|
-        case ( validation, disabled ) of
-            ( _, True ) ->
-                cls.disabled
+    case ( validation, disabled ) of
+        ( _, True ) ->
+            cls.disabled
 
-            ( Err _, _ ) ->
-                cls.error
+        ( Err _, _ ) ->
+            cls.error
 
-            ( Ok _, _ ) ->
-                cls.default
+        ( Ok _, _ ) ->
+            cls.default

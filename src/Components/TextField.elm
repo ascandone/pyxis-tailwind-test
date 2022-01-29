@@ -275,20 +275,22 @@ viewAddon : Config msg -> Addon -> Html msg
 viewAddon config { type_, placement } =
     let
         commonCls =
-            Utils.stateClass config.validation
-                config.disabled
-                { default = """
+            class <|
+                Utils.stateClass
+                    config.validation
+                    config.disabled
+                    { default = """
                         group-hover:border-cyan-600 group-focus-within:border-cyan-600
                         group-focus-within:text-cyan-600 group-hover:text-cyan-600
                         text-gray-500
                     """
-                , disabled = "text-gray-400 border-neutral-300"
-                , error = """
+                    , disabled = "text-gray-400 border-neutral-300"
+                    , error = """
                         group-hover:border-red-600 group-focus-within:border-red-600
                         group-focus-within:text-red-600 group-hover:text-red-600
                         text-red-500
                     """
-                }
+                    }
     in
     case type_ of
         TextAddon text_ ->

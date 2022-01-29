@@ -1,5 +1,8 @@
 module Components.TextArea exposing
     ( Attribute
+    , disabled
+    , id
+    , label
     , onInput
     , placeholder
     , validation
@@ -9,9 +12,12 @@ module Components.TextArea exposing
 
 import Browser exposing (UrlRequest(..))
 import Components.Internal as Internal
+import Components.Label as Label
+import Components.Label.Internal as LabelInternal
 import Html exposing (Html)
 import Html.Attributes
 import Html.Events
+import Html.Extra as Html
 import Utils
 
 
@@ -23,6 +29,8 @@ type alias Config msg =
     { textFieldAttributes : List (Html.Attribute msg)
     , validation : Result String ()
     , disabled : Bool
+    , id : Maybe String
+    , label : Maybe LabelInternal.Label
     }
 
 
@@ -31,6 +39,8 @@ defaultConfig =
     { textFieldAttributes = []
     , validation = Ok ()
     , disabled = False
+    , id = Nothing
+    , label = Nothing
     }
 
 
@@ -44,6 +54,16 @@ value =
     inputAttribute << Html.Attributes.value
 
 
+id : String -> Attribute msg
+id id_ =
+    Attribute <| \c -> { c | id = Just id_ }
+
+
+disabled : Bool -> Attribute msg
+disabled disabled_ =
+    Attribute <| \c -> { c | disabled = disabled_ }
+
+
 placeholder : String -> Attribute msg
 placeholder =
     inputAttribute << Html.Attributes.placeholder
@@ -52,6 +72,26 @@ placeholder =
 validation : Result String x -> Attribute msg
 validation validation_ =
     Attribute <| \c -> { c | validation = validation_ |> Result.map (\_ -> ()) }
+
+
+label : Label.Position -> Label.Type -> Attribute msg
+label position type_ =
+    let
+        label_ =
+            case type_ of
+                LabelInternal.Single l1 ->
+                    { position = position
+                    , label = l1
+                    , secondaryLabel = Nothing
+                    }
+
+                LabelInternal.Double l1 l2 ->
+                    { position = position
+                    , label = l1
+                    , secondaryLabel = Just l2
+                    }
+    in
+    Attribute <| \c -> { c | label = Just label_ }
 
 
 
@@ -81,13 +121,26 @@ view attrs =
         config =
             makeConfig attrs
     in
-    Html.div
-        [ Internal.formFieldClass config
-        ]
-        [ Utils.concatArgs Html.textarea
-            [ [ Html.Attributes.class "px-3 py-3 w-full focus:outline-none rounded-lg"
-              ]
-            , config.textFieldAttributes
+    Html.div []
+        [ Html.viewMaybe (viewLabel config) config.label
+        , Html.div
+            [ Internal.formFieldClass config
             ]
-            []
+            [ Utils.concatArgs Html.textarea
+                [ [ Html.Attributes.class "px-3 py-3 w-full focus:outline-none rounded-lg"
+                  , Html.Attributes.disabled config.disabled
+                  ]
+                , config.textFieldAttributes
+                ]
+                []
+            ]
         ]
+
+
+viewLabel : { r | id : Maybe String } -> LabelInternal.Label -> Html msg
+viewLabel config label_ =
+    LabelInternal.view
+        { size = LabelInternal.medium
+        , id = config.id
+        , label = label_
+        }
