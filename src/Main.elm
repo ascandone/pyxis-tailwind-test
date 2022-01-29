@@ -86,23 +86,18 @@ view _ =
             ]
         , TextField.view
             [ TextField.placeholder "Input Text"
-            , TextField.size TextField.small
+            , TextField.validation (Err "Error message")
+            , TextField.addon TextField.leading (TextField.textAddon "€")
+            ]
+        , TextField.view
+            [ TextField.placeholder "Input Text"
+            , TextField.disabled True
             , TextField.addon TextField.leading (TextField.textAddon "€")
             ]
         , TextField.view
             [ TextField.placeholder "Input Text"
             , TextField.size TextField.small
-            , TextField.addon TextField.trailing (TextField.textAddon "€")
-            ]
-        , TextField.view
-            [ TextField.placeholder "Input Text"
-            , TextField.validation (Err "Error message")
-            , TextField.addon TextField.trailing (TextField.textAddon "€")
-            ]
-        , TextField.view
-            [ TextField.placeholder "Input Text"
-            , TextField.disabled True
-            , TextField.addon TextField.trailing (TextField.textAddon "€")
+            , TextField.addon TextField.leading (TextField.textAddon "€")
             ]
         , header "Icon addon"
         , TextField.view
@@ -122,6 +117,11 @@ view _ =
             [ TextField.placeholder "Input Text"
             , TextField.addon TextField.leading (TextField.iconAddon FeatherIcons.link)
             , TextField.disabled True
+            ]
+        , TextField.view
+            [ TextField.placeholder "Input Text"
+            , TextField.addon TextField.leading (TextField.iconAddon FeatherIcons.link)
+            , TextField.size TextField.small
             ]
         , header "Textarea"
         , TextArea.view
