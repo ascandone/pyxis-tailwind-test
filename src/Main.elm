@@ -1,6 +1,7 @@
 module Main exposing (main)
 
 import Browser
+import Components.TextField as TextField
 import Html exposing (..)
 import Html.Attributes exposing (class)
 
@@ -50,5 +51,21 @@ subscriptions _ =
 
 view : Model -> Html Msg
 view _ =
-    div [ class "p-2 font-semibold text-gray-900" ]
-        [ text "Hello world!" ]
+    div [ class "p-8 max-w-md antialiased space-y-4" ]
+        [ TextField.view
+            [ TextField.placeholder "Input Text"
+            , TextField.size TextField.small
+            ]
+        , TextField.view
+            [ TextField.value "Input Text"
+            , TextField.placeholder "Input Text"
+            ]
+        , TextField.view
+            [ TextField.validation (Err "Error message")
+            , TextField.placeholder "Input Text"
+            ]
+        , TextField.view
+            [ TextField.disabled True
+            , TextField.placeholder "Input Text"
+            ]
+        ]
