@@ -86,13 +86,13 @@ header text_ =
 viewPageLink : Page -> String -> Page -> Html Page
 viewPageLink thisPage text_ currentPage =
     button
-        [ class "px-4 py-2 leading-none rounded"
+        [ class "px-4 py-2 font-semibold leading-none rounded"
         , class <|
             if currentPage == thisPage then
-                "bg-zinc-900 text-white"
+                "bg-cyan-900 text-white"
 
             else
-                "bg-zinc-200"
+                "bg-cyan-700/20"
         , onClick thisPage
         ]
         [ text text_ ]
@@ -102,7 +102,7 @@ view : Model -> Html Msg
 view model =
     div []
         [ Html.map SetPage <|
-            div [ class "mx-auto max-w-screen-lg px-4 py-4 flex gap-x-4" ]
+            div [ class "mx-auto overflow-x-auto max-w-screen-lg px-4 py-4 flex gap-x-4" ]
                 (List.map (\c -> c model.page)
                     [ viewPageLink Button "Button"
                     , viewPageLink TextField "TextField"
