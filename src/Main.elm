@@ -10,6 +10,7 @@ import FeatherIcons
 import Html exposing (..)
 import Html.Attributes exposing (class)
 import Html.Events exposing (onClick)
+import Section exposing (Section)
 
 
 main : Program () Model Msg
@@ -79,19 +80,19 @@ update msg model =
 
 header : String -> Html msg
 header text_ =
-    Html.h3 [ Html.Attributes.class "pt-3 text-3xl tracking-wide text-gray-900 font-serif" ] [ Html.text text_ ]
+    Html.h3 [ Html.Attributes.class "text-2xl tracking-wide text-gray-900 font-serif" ] [ Html.text text_ ]
 
 
 viewPageLink : Page -> String -> Page -> Html Page
 viewPageLink thisPage text_ currentPage =
     button
-        [ class "px-2 py-2 rounded"
+        [ class "px-4 py-2 leading-none rounded"
         , class <|
             if currentPage == thisPage then
                 "bg-zinc-900 text-white"
 
             else
-                "bg-zinc-300"
+                "bg-zinc-200"
         , onClick thisPage
         ]
         [ text text_ ]
@@ -99,252 +100,277 @@ viewPageLink thisPage text_ currentPage =
 
 view : Model -> Html Msg
 view model =
-    div [ class "bg-gray-100 mb-8" ]
+    div []
         [ Html.map SetPage <|
             div [ class "mx-auto max-w-screen-lg px-4 py-4 flex gap-x-4" ]
                 (List.map (\c -> c model.page)
                     [ viewPageLink Button "Button"
                     , viewPageLink TextField "TextField"
                     , viewPageLink TextArea "TextArea"
-
-                    -- , viewPageLink Autocomplete "Autocomplete"
                     ]
                 )
-        , div [ class "bg-white mx-auto shadow-md" ]
-            [ div [ class "px-4 py-6 antialiased space-y-6 mx-auto max-w-screen-lg" ] (viewPage model)
-            ]
+        , viewPage model
+        , div [ class "h-10" ] []
         ]
 
 
-viewPage : Model -> List (Html Msg)
+section : String -> List (Html msg) -> Html msg
+section header_ children =
+    Html.section [ class "bg-white rounded shadow-soft px-6 pt-2 pb-4 " ]
+        [ header header_
+        , div [ class "h-4" ] []
+        , div [ class "space-y-4" ] children
+        ]
+
+
+viewPage : Model -> Html Msg
 viewPage model =
-    case model.page of
-        Button ->
-            viewButton
+    Section.view <|
+        case model.page of
+            Button ->
+                buttonSections
 
-        TextField ->
-            viewTextField
+            TextField ->
+                textFieldSections
 
-        TextArea ->
-            viewTextArea
+            TextArea ->
+                textAreaSections
 
-        Autocomplete ->
-            viewAutocomplete model.autocompleteValue model.autocompleteModel
+            Autocomplete ->
+                autocompleteSections model.autocompleteValue model.autocompleteModel
 
 
-viewButton : List (Html msg)
-viewButton =
+buttonSections : List (Section msg)
+buttonSections =
     let
         btnGroup =
             div [ class "flex gap-x-8 gap-y-3 items-start flex-wrap" ]
     in
-    [ header "Primary"
-    , btnGroup
-        [ Button.primary [ Button.size Button.small ] "Text"
-        , Button.primary [ Button.size Button.medium ] "Text"
-        , Button.primary [ Button.size Button.large ] "Text"
-        , Button.primary [ Button.size Button.huge ] "Text"
-        , Button.primary [ Button.loading True ] "Text"
+    [ Section.section "Primary"
+        [ btnGroup
+            [ Button.primary [ Button.size Button.small ] "Text"
+            , Button.primary [ Button.size Button.medium ] "Text"
+            , Button.primary [ Button.size Button.large ] "Text"
+            , Button.primary [ Button.size Button.huge ] "Text"
+            , Button.primary [ Button.loading True ] "Text"
+            ]
+        , btnGroup
+            [ Button.primary [ Button.loading True ] "Text"
+            ]
         ]
-    , header "Secondary"
-    , btnGroup
-        [ Button.secondary [ Button.size Button.small ] "Text"
-        , Button.secondary [ Button.size Button.medium ] "Text"
-        , Button.secondary [ Button.size Button.large ] "Text"
-        , Button.secondary [ Button.size Button.huge ] "Text"
-        , Button.secondary [ Button.loading True ] "Text"
+    , Section.section "Secondary"
+        [ btnGroup
+            [ Button.secondary [ Button.size Button.small ] "Text"
+            , Button.secondary [ Button.size Button.medium ] "Text"
+            , Button.secondary [ Button.size Button.large ] "Text"
+            , Button.secondary [ Button.size Button.huge ] "Text"
+            ]
+        , btnGroup
+            [ Button.secondary [ Button.loading True ] "Text"
+            ]
         ]
-    , header "Tertiary"
-    , btnGroup
-        [ Button.tertiary [ Button.size Button.small ] "Text"
-        , Button.tertiary [ Button.size Button.medium ] "Text"
-        , Button.tertiary [ Button.size Button.large ] "Text"
-        , Button.tertiary [ Button.size Button.huge ] "Text"
-        , Button.tertiary [ Button.loading True ] "Text"
+    , Section.section "Tertiary"
+        [ btnGroup
+            [ Button.tertiary [ Button.size Button.small ] "Text"
+            , Button.tertiary [ Button.size Button.medium ] "Text"
+            , Button.tertiary [ Button.size Button.large ] "Text"
+            , Button.tertiary [ Button.size Button.huge ] "Text"
+            , Button.tertiary [ Button.loading True ] "Text"
+            ]
         ]
-    , header "Brand"
-    , btnGroup
-        [ Button.brand [ Button.size Button.small ] "Text"
-        , Button.brand [ Button.size Button.medium ] "Text"
-        , Button.brand [ Button.size Button.large ] "Text"
-        , Button.brand [ Button.size Button.huge ] "Text"
-        , Button.brand [ Button.loading True ] "Text"
+    , Section.section "Brand"
+        [ btnGroup
+            [ Button.brand [ Button.size Button.small ] "Text"
+            , Button.brand [ Button.size Button.medium ] "Text"
+            , Button.brand [ Button.size Button.large ] "Text"
+            , Button.brand [ Button.size Button.huge ] "Text"
+            , Button.brand [ Button.loading True ] "Text"
+            ]
         ]
-    , header "Ghost"
-    , btnGroup
-        [ Button.ghost [ Button.size Button.small ] "Text"
-        , Button.ghost [ Button.size Button.medium ] "Text"
-        , Button.ghost [ Button.size Button.large ] "Text"
-        , Button.ghost [ Button.size Button.huge ] "Text"
+    , Section.section "Ghost"
+        [ btnGroup
+            [ Button.ghost [ Button.size Button.small ] "Text"
+            , Button.ghost [ Button.size Button.medium ] "Text"
+            , Button.ghost [ Button.size Button.large ] "Text"
+            , Button.ghost [ Button.size Button.huge ] "Text"
+            ]
         ]
-    , header "Loading"
-    , btnGroup
-        [ Button.primary [ Button.loading True, Button.size Button.small ] "Text"
-        , Button.primary [ Button.loading True, Button.size Button.medium ] "Text"
-        , Button.primary [ Button.loading True, Button.size Button.large ] "Text"
-        , Button.primary [ Button.loading True, Button.size Button.huge ] "Text"
-        ]
-    ]
-
-
-viewTextField : List (Html msg)
-viewTextField =
-    [ header "Default"
-    , TextField.view
-        [ TextField.placeholder "Input Text"
-        ]
-    , TextField.view
-        [ TextField.value "Input Text"
-        ]
-    , TextField.view
-        [ TextField.validation (Err "Error message")
-        , TextField.placeholder "Input Text"
-        ]
-    , TextField.view
-        [ TextField.disabled True
-        , TextField.placeholder "Input Text"
-        ]
-    , TextField.view
-        [ TextField.placeholder "Input Text"
-        , TextField.size TextField.small
-        ]
-    , header "Labeled"
-    , TextField.view
-        [ TextField.placeholder "Input Text"
-        , TextField.label Label.vertical (Label.single "Label")
-        , TextField.id "item-id"
-        ]
-    , TextField.view
-        [ TextField.placeholder "Input Text"
-        , TextField.label Label.vertical (Label.double "Label" "Second label")
-        ]
-    , TextField.view
-        [ TextField.placeholder "Input Text"
-        , TextField.label Label.horizontal (Label.single "Label")
-        ]
-    , TextField.view
-        [ TextField.placeholder "Input Text"
-        , TextField.label Label.horizontal (Label.double "Label" "Second label")
-        ]
-    , TextField.view
-        [ TextField.placeholder "Input Text"
-        , TextField.label Label.vertical (Label.single "Label")
-        , TextField.size TextField.small
-        ]
-    , TextField.view
-        [ TextField.placeholder "Input Text"
-        , TextField.label Label.vertical (Label.double "Label" "Second label")
-        , TextField.size TextField.small
-        ]
-    , TextField.view
-        [ TextField.placeholder "Input Text"
-        , TextField.label Label.horizontal (Label.single "Label")
-        , TextField.size TextField.small
-        ]
-    , TextField.view
-        [ TextField.placeholder "Input Text"
-        , TextField.label Label.horizontal (Label.double "Label" "Second label")
-        , TextField.size TextField.small
-        ]
-    , header "Text addon"
-    , TextField.view
-        [ TextField.placeholder "Input Text"
-        , TextField.addon TextField.leading (TextField.textAddon "€")
-        ]
-    , TextField.view
-        [ TextField.placeholder "Input Text"
-        , TextField.addon TextField.trailing (TextField.textAddon "€")
-        ]
-    , TextField.view
-        [ TextField.placeholder "Input Text"
-        , TextField.validation (Err "Error message")
-        , TextField.addon TextField.leading (TextField.textAddon "€")
-        ]
-    , TextField.view
-        [ TextField.placeholder "Input Text"
-        , TextField.disabled True
-        , TextField.addon TextField.leading (TextField.textAddon "€")
-        ]
-    , TextField.view
-        [ TextField.placeholder "Input Text"
-        , TextField.size TextField.small
-        , TextField.addon TextField.leading (TextField.textAddon "€")
-        ]
-    , header "Icon addon"
-    , TextField.view
-        [ TextField.placeholder "Input Text"
-        , TextField.addon TextField.leading (TextField.iconAddon FeatherIcons.link)
-        ]
-    , TextField.view
-        [ TextField.placeholder "Input Text"
-        , TextField.addon TextField.trailing (TextField.iconAddon FeatherIcons.link)
-        ]
-    , TextField.view
-        [ TextField.placeholder "Input Text"
-        , TextField.addon TextField.leading (TextField.iconAddon FeatherIcons.link)
-        , TextField.validation (Err "Error message")
-        ]
-    , TextField.view
-        [ TextField.placeholder "Input Text"
-        , TextField.addon TextField.leading (TextField.iconAddon FeatherIcons.link)
-        , TextField.disabled True
-        ]
-    , TextField.view
-        [ TextField.placeholder "Input Text"
-        , TextField.addon TextField.leading (TextField.iconAddon FeatherIcons.link)
-        , TextField.size TextField.small
+    , Section.section "Loading"
+        [ btnGroup
+            [ Button.primary [ Button.loading True, Button.size Button.small ] "Text"
+            , Button.primary [ Button.loading True, Button.size Button.medium ] "Text"
+            , Button.primary [ Button.loading True, Button.size Button.large ] "Text"
+            , Button.primary [ Button.loading True, Button.size Button.huge ] "Text"
+            ]
         ]
     ]
 
 
-viewTextArea : List (Html msg)
-viewTextArea =
-    [ header "Textarea"
-    , TextArea.view
-        [ TextArea.placeholder "Input Text"
+textFieldSections : List (Section msg)
+textFieldSections =
+    [ Section.section "Default"
+        [ TextField.view
+            [ TextField.placeholder "Input Text"
+            ]
+        , TextField.view
+            [ TextField.value "Input Text"
+            ]
+        , TextField.view
+            [ TextField.validation (Err "Error message")
+            , TextField.placeholder "Input Text"
+            ]
+        , TextField.view
+            [ TextField.disabled True
+            , TextField.placeholder "Input Text"
+            ]
+        , TextField.view
+            [ TextField.placeholder "Input Text"
+            , TextField.size TextField.small
+            ]
         ]
-    , TextArea.view
-        [ TextArea.value "Input Text"
+    , Section.section "Labeled"
+        [ TextField.view
+            [ TextField.placeholder "Input Text"
+            , TextField.label Label.vertical (Label.single "Label")
+            , TextField.id "item-id"
+            ]
+        , TextField.view
+            [ TextField.placeholder "Input Text"
+            , TextField.label Label.vertical (Label.double "Label" "Second label")
+            ]
+        , TextField.view
+            [ TextField.placeholder "Input Text"
+            , TextField.label Label.horizontal (Label.single "Label")
+            ]
+        , TextField.view
+            [ TextField.placeholder "Input Text"
+            , TextField.label Label.horizontal (Label.double "Label" "Second label")
+            ]
+        , TextField.view
+            [ TextField.placeholder "Input Text"
+            , TextField.label Label.vertical (Label.single "Label")
+            , TextField.size TextField.small
+            ]
+        , TextField.view
+            [ TextField.placeholder "Input Text"
+            , TextField.label Label.vertical (Label.double "Label" "Second label")
+            , TextField.size TextField.small
+            ]
+        , TextField.view
+            [ TextField.placeholder "Input Text"
+            , TextField.label Label.horizontal (Label.single "Label")
+            , TextField.size TextField.small
+            ]
+        , TextField.view
+            [ TextField.placeholder "Input Text"
+            , TextField.label Label.horizontal (Label.double "Label" "Second label")
+            , TextField.size TextField.small
+            ]
         ]
-    , TextArea.view
-        [ TextArea.value "Input Text"
-        , TextArea.validation (Err "Error message")
+    , Section.section "Text addon"
+        [ TextField.view
+            [ TextField.placeholder "Input Text"
+            , TextField.addon TextField.leading (TextField.textAddon "€")
+            ]
+        , TextField.view
+            [ TextField.placeholder "Input Text"
+            , TextField.addon TextField.trailing (TextField.textAddon "€")
+            ]
+        , TextField.view
+            [ TextField.placeholder "Input Text"
+            , TextField.validation (Err "Error message")
+            , TextField.addon TextField.leading (TextField.textAddon "€")
+            ]
+        , TextField.view
+            [ TextField.placeholder "Input Text"
+            , TextField.disabled True
+            , TextField.addon TextField.leading (TextField.textAddon "€")
+            ]
+        , TextField.view
+            [ TextField.placeholder "Input Text"
+            , TextField.size TextField.small
+            , TextField.addon TextField.leading (TextField.textAddon "€")
+            ]
         ]
-    , TextArea.view
-        [ TextArea.placeholder "Input Text"
-        , TextArea.disabled True
-        ]
-    , TextArea.view
-        [ TextArea.placeholder "Input Text"
-        , TextArea.label Label.horizontal (Label.single "Label")
-        ]
-    , TextArea.view
-        [ TextArea.placeholder "Input Text"
-        , TextArea.label Label.horizontal (Label.double "Label" "Second label")
-        ]
-    , TextArea.view
-        [ TextArea.placeholder "Input Text"
-        , TextArea.label Label.vertical (Label.single "Label")
-        ]
-    , TextArea.view
-        [ TextArea.placeholder "Input Text"
-        , TextArea.label Label.vertical (Label.double "Label" "Second label")
+    , Section.section "Icon addon"
+        [ TextField.view
+            [ TextField.placeholder "Input Text"
+            , TextField.addon TextField.leading (TextField.iconAddon FeatherIcons.link)
+            ]
+        , TextField.view
+            [ TextField.placeholder "Input Text"
+            , TextField.addon TextField.trailing (TextField.iconAddon FeatherIcons.link)
+            ]
+        , TextField.view
+            [ TextField.placeholder "Input Text"
+            , TextField.addon TextField.leading (TextField.iconAddon FeatherIcons.link)
+            , TextField.validation (Err "Error message")
+            ]
+        , TextField.view
+            [ TextField.placeholder "Input Text"
+            , TextField.addon TextField.leading (TextField.iconAddon FeatherIcons.link)
+            , TextField.disabled True
+            ]
+        , TextField.view
+            [ TextField.placeholder "Input Text"
+            , TextField.addon TextField.leading (TextField.iconAddon FeatherIcons.link)
+            , TextField.size TextField.small
+            ]
         ]
     ]
 
 
-viewAutocomplete : Maybe Int -> Autocomplete.Model -> List (Html Msg)
-viewAutocomplete selected model =
-    [ Autocomplete.view model
-        [ Autocomplete.selected selected
-        , Autocomplete.placeholder "Autocomplete"
+textAreaSections : List (Section msg)
+textAreaSections =
+    [ Section.section "Default"
+        [ TextArea.view
+            [ TextArea.placeholder "Input Text"
+            ]
+        , TextArea.view
+            [ TextArea.value "Input Text"
+            ]
+        , TextArea.view
+            [ TextArea.value "Input Text"
+            , TextArea.validation (Err "Error message")
+            ]
+        , TextArea.view
+            [ TextArea.placeholder "Input Text"
+            , TextArea.disabled True
+            ]
+        , TextArea.view
+            [ TextArea.placeholder "Input Text"
+            , TextArea.label Label.horizontal (Label.single "Label")
+            ]
+        , TextArea.view
+            [ TextArea.placeholder "Input Text"
+            , TextArea.label Label.horizontal (Label.double "Label" "Second label")
+            ]
+        , TextArea.view
+            [ TextArea.placeholder "Input Text"
+            , TextArea.label Label.vertical (Label.single "Label")
+            ]
+        , TextArea.view
+            [ TextArea.placeholder "Input Text"
+            , TextArea.label Label.vertical (Label.double "Label" "Second label")
+            ]
         ]
-        [ Autocomplete.option 1 "Item option 1"
-        , Autocomplete.option 2 "Item option 2"
-        , Autocomplete.option 3 "Item option 3"
-        , Autocomplete.option 4 "Item option 4"
-        , Autocomplete.option 5 "Item option 5"
-        , Autocomplete.option 6 "Item option 6"
+    ]
+
+
+autocompleteSections : Maybe Int -> Autocomplete.Model -> List (Section Msg)
+autocompleteSections selected model =
+    [ Section.section "Default"
+        [ Autocomplete.view model
+            [ Autocomplete.selected selected
+            , Autocomplete.placeholder "Autocomplete"
+            ]
+            [ Autocomplete.option 1 "Item option 1"
+            , Autocomplete.option 2 "Item option 2"
+            , Autocomplete.option 3 "Item option 3"
+            , Autocomplete.option 4 "Item option 4"
+            , Autocomplete.option 5 "Item option 5"
+            , Autocomplete.option 6 "Item option 6"
+            ]
+            |> Html.map AutocompleteMsg
         ]
-        |> Html.map AutocompleteMsg
     ]
