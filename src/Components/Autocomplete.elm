@@ -219,5 +219,5 @@ crossIconButton =
         , Html.Events.onClick ClearSelection
         ]
         [ FeatherIcons.x
-            |> FeatherIcons.toHtml [ Svg.Attributes.class "fill-current" ]
+            |> FeatherIcons.toHtml []
         ]

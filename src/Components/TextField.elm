@@ -323,7 +323,5 @@ viewAddon config { type_, placement } =
                             Medium ->
                                 22
                         )
-                    |> FeatherIcons.toHtml
-                        [ Svg.Attributes.class "fill-current"
-                        ]
+                    |> FeatherIcons.toHtml []
                 ]
