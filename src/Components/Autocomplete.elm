@@ -17,6 +17,7 @@ import FeatherIcons
 import Html exposing (Html)
 import Html.Attributes exposing (class)
 import Html.Events
+import Svg.Attributes
 import Utils
 
 
@@ -207,7 +208,7 @@ searchIcon : Html msg
 searchIcon =
     Html.div [ class "p-1" ]
         [ FeatherIcons.search
-            |> FeatherIcons.toHtml [ class "fill-gray-600" ]
+            |> FeatherIcons.toHtml [ Svg.Attributes.class "fill-gray-600" ]
         ]
 
 
@@ -218,5 +219,5 @@ crossIconButton =
         , Html.Events.onClick ClearSelection
         ]
         [ FeatherIcons.x
-            |> FeatherIcons.toHtml [ class "fill-current" ]
+            |> FeatherIcons.toHtml [ Svg.Attributes.class "fill-current" ]
         ]
