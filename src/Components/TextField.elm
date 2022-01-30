@@ -197,7 +197,7 @@ view attrs =
         config =
             makeConfig attrs
     in
-    Html.div []
+    Html.div [ class "max-w-md" ]
         [ LabelInternal.view
             { size =
                 case config.size of
