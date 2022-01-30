@@ -21,8 +21,8 @@ viewSection : Section msg -> Html msg
 viewSection (Section header_ children) =
     Html.section [ class "bg-white rounded-md shadow-soft px-8 pt-4 pb-10" ]
         [ Html.h3 [ class "text-2xl tracking-wide text-gray-900 font-serif" ] [ Html.text header_ ]
-        , Html.div [ class "h-6" ] []
-        , Html.div [ class "space-y-4" ] children
+        , Html.div [ class "h-2" ] []
+        , Html.div [ class "space-y-8" ] children
         ]
 
 
