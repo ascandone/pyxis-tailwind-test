@@ -35,7 +35,8 @@ type alias ButtonIcon =
 
 
 type alias Config msg =
-    { buttonAttributes : List (Html.Attribute msg)
+    { variant : Variant
+    , buttonAttributes : List (Html.Attribute msg)
     , size : Size
     , loading : Bool
     , icon : Maybe ButtonIcon
@@ -43,9 +44,10 @@ type alias Config msg =
     }
 
 
-defaultConfig : Config msg
-defaultConfig =
-    { buttonAttributes = []
+defaultConfig : Variant -> Config msg
+defaultConfig variant =
+    { variant = variant
+    , buttonAttributes = []
     , size = Medium
     , loading = False
     , icon = Nothing
@@ -149,11 +151,11 @@ onBlur =
 -- View
 
 
-makeConfig : List (Attribute msg) -> Config msg
-makeConfig =
+makeConfig : Variant -> List (Attribute msg) -> Config msg
+makeConfig variant =
     Utils.getMakeConfig
         { unwrap = \(Attribute f) -> f
-        , defaultConfig = defaultConfig
+        , defaultConfig = defaultConfig variant
         }
 
 
@@ -233,9 +235,9 @@ isIconOnly config =
             False
 
 
-normalizeConfig : Variant -> Config msg -> Config msg
-normalizeConfig variant config =
-    case variant of
+normalizeConfig : Config msg -> Config msg
+normalizeConfig config =
+    case config.variant of
         Ghost ->
             { config
                 | icon = Nothing
@@ -251,7 +253,7 @@ view : Variant -> List (Attribute msg) -> String -> Html msg
 view variant attrs text_ =
     let
         config =
-            makeConfig attrs |> normalizeConfig variant
+            makeConfig variant attrs |> normalizeConfig
 
         sizeCls =
             sizeClass config.size
@@ -286,7 +288,7 @@ view variant attrs text_ =
           ]
         , config.buttonAttributes
         ]
-        [ viewButtonContent variant config text_
+        [ viewButtonContent config text_
         ]
 
 
@@ -307,16 +309,16 @@ setIconSize size_ =
                 24
 
 
-viewButtonContent : Variant -> Config msg -> String -> Html msg
-viewButtonContent variant config text_ =
+viewButtonContent : Config msg -> String -> Html msg
+viewButtonContent config text_ =
     if config.loading then
-        viewSpinner variant config
+        viewSpinner config
 
     else
         let
             textContent =
                 viewTextContent
-                    { isGhost = variant == Ghost
+                    { isGhost = config.variant == Ghost
                     , text_ = text_
                     }
         in
@@ -328,25 +330,25 @@ viewButtonContent variant config text_ =
                 Html.div [ class "flex items-center justify-center gap-x-1" ] <|
                     case btnIcon.placement of
                         Only ->
-                            [ viewIcon variant btnIcon config
+                            [ viewIcon btnIcon config
                             ]
 
                         Leading ->
-                            [ viewIcon variant btnIcon config
+                            [ viewIcon btnIcon config
                             , textContent
                             ]
 
                         Trailing ->
                             [ textContent
-                            , viewIcon variant btnIcon config
+                            , viewIcon btnIcon config
                             ]
 
 
-viewIcon : Variant -> ButtonIcon -> { r | size : Size } -> Html msg
-viewIcon variant btnIcon config =
+viewIcon : ButtonIcon -> { r | size : Size, variant : Variant } -> Html msg
+viewIcon btnIcon config =
     Html.i
         [ class <|
-            if isBackgroundFilled variant then
+            if isBackgroundFilled config.variant then
                 "text-white"
 
             else
@@ -358,13 +360,13 @@ viewIcon variant btnIcon config =
         ]
 
 
-viewSpinner : Variant -> { r | size : Size } -> Html msg
-viewSpinner variant config =
+viewSpinner : { r | size : Size, variant : Variant } -> Html msg
+viewSpinner config =
     Html.div [ class "flex justify-center w-full" ]
         [ Html.div
             [ class "rounded-full border-2 animate-spin"
             , class <|
-                if isBackgroundFilled variant then
+                if isBackgroundFilled config.variant then
                     "border-white/20 border-t-white"
 
                 else
