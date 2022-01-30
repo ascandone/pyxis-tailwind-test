@@ -1,4 +1,4 @@
-module Components.Internal exposing (formFieldClass, formFieldTransitionClass, viewValidationMessage)
+module Components.Internal exposing (formFieldClass, formFieldRadiusClass, formFieldTransitionClass, viewValidationMessage)
 
 import Html exposing (Attribute, Html)
 import Html.Attributes exposing (class, classList)
@@ -10,10 +10,16 @@ formFieldTransitionClass =
     "duration-200 ease-in-out"
 
 
+formFieldRadiusClass : String
+formFieldRadiusClass =
+    "rounded-lg"
+
+
 formFieldClass : { r | validation : Result error (), disabled : Bool } -> Attribute msg
 formFieldClass { validation, disabled } =
     classList
-        [ ( "group flex-1 flex border-2 rounded-lg leading-none transition-all", True )
+        [ ( "group flex-1 flex border-2 leading-none transition-all", True )
+        , ( formFieldRadiusClass, True )
         , ( formFieldTransitionClass, True )
         , ( case ( validation, disabled ) of
                 ( _, True ) ->

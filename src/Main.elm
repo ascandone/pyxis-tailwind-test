@@ -1,6 +1,7 @@
 module Main exposing (main)
 
 import Browser
+import Components.Autocomplete as Autocomplete exposing (Model)
 import Components.Label as Label
 import Components.TextArea as TextArea
 import Components.TextField as TextField
@@ -23,16 +24,21 @@ main =
 type Page
     = TextField
     | TextArea
+    | Autocomplete
 
 
 type alias Model =
     { page : Page
+    , autocompleteModel : Autocomplete.Model
+    , autocompleteValue : Maybe Int
     }
 
 
 init : () -> ( Model, Cmd Msg )
 init _ =
     ( { page = TextField
+      , autocompleteModel = Autocomplete.init
+      , autocompleteValue = Nothing
       }
     , Cmd.none
     )
@@ -40,6 +46,7 @@ init _ =
 
 type Msg
     = SetPage Page
+    | AutocompleteMsg (Autocomplete.Msg Int)
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -47,6 +54,23 @@ update msg model =
     case msg of
         SetPage page ->
             ( { model | page = page }
+            , Cmd.none
+            )
+
+        AutocompleteMsg subMsg ->
+            let
+                ( newModel, evt ) =
+                    Autocomplete.update subMsg model.autocompleteModel
+
+                updatedModel =
+                    { model | autocompleteModel = newModel }
+            in
+            ( case evt of
+                Autocomplete.Noop ->
+                    updatedModel
+
+                Autocomplete.SelectionChange newValue ->
+                    { updatedModel | autocompleteValue = newValue }
             , Cmd.none
             )
 
@@ -79,22 +103,27 @@ view model =
                 (List.map (\c -> c model.page)
                     [ viewPageLink TextField "TextField"
                     , viewPageLink TextArea "TextArea"
+
+                    -- , viewPageLink Autocomplete "Autocomplete"
                     ]
                 )
         , div [ class "bg-white mx-auto shadow-md" ]
-            [ div [ class "px-4 py-6 antialiased space-y-6 mx-auto max-w-screen-lg" ] (viewPage model.page)
+            [ div [ class "px-4 py-6 antialiased space-y-6 mx-auto max-w-screen-lg" ] (viewPage model)
             ]
         ]
 
 
-viewPage : Page -> List (Html msg)
-viewPage page =
-    case page of
+viewPage : Model -> List (Html Msg)
+viewPage model =
+    case model.page of
         TextField ->
             viewTextField
 
         TextArea ->
             viewTextArea
+
+        Autocomplete ->
+            viewAutocomplete model.autocompleteValue model.autocompleteModel
 
 
 viewTextField : List (Html msg)
@@ -240,4 +269,21 @@ viewTextArea =
         [ TextArea.placeholder "Input Text"
         , TextArea.label Label.vertical (Label.double "Label" "Second label")
         ]
+    ]
+
+
+viewAutocomplete : Maybe Int -> Autocomplete.Model -> List (Html Msg)
+viewAutocomplete selected model =
+    [ Autocomplete.view model
+        [ Autocomplete.selected selected
+        , Autocomplete.placeholder "Autocomplete"
+        ]
+        [ Autocomplete.option 1 "Item option 1"
+        , Autocomplete.option 2 "Item option 2"
+        , Autocomplete.option 3 "Item option 3"
+        , Autocomplete.option 4 "Item option 4"
+        , Autocomplete.option 5 "Item option 5"
+        , Autocomplete.option 6 "Item option 6"
+        ]
+        |> Html.map AutocompleteMsg
     ]

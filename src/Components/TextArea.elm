@@ -121,7 +121,7 @@ view attrs =
         config =
             makeConfig attrs
     in
-    Html.div []
+    Html.div [ class "max-w-md" ]
         [ LabelInternal.view
             { size = LabelInternal.medium
             , id = config.id
@@ -129,7 +129,8 @@ view attrs =
             }
             (Html.div [ Internal.formFieldClass config ]
                 [ Utils.concatArgs Html.textarea
-                    [ [ class "px-3 py-3 w-full focus:outline-none rounded-lg"
+                    [ [ class "px-3 py-3 w-full focus:outline-none"
+                      , class Internal.formFieldRadiusClass
                       , Html.Attributes.disabled config.disabled
                       ]
                     , config.textFieldAttributes

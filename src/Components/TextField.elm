@@ -233,7 +233,8 @@ view attrs =
 viewInput : Config msg -> Html msg
 viewInput config =
     Utils.concatArgs Html.input
-        [ [ class "w-full rounded-lg bg-transparent outline-none leading-none"
+        [ [ class "w-full bg-transparent outline-none leading-none"
+          , class Internal.formFieldRadiusClass
           , class <|
                 case config.size of
                     Medium ->
