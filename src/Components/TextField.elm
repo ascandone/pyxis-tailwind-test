@@ -29,7 +29,6 @@ import Html.Attributes exposing (class)
 import Html.Events
 import Html.Extra as Html
 import Maybe.Extra as Maybe
-import Svg.Attributes
 import Utils
 
 
