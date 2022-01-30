@@ -16,7 +16,6 @@ module Components.Button exposing
     , tertiary
     )
 
-import Heroicons.Outline
 import Html exposing (Html)
 import Html.Attributes exposing (class, classList)
 import Html.Events
