@@ -30,6 +30,7 @@ makeSection constructor header =
         , makeGroup_ [ Button.icon Button.leadingPlacement FeatherIcons.edit2 ]
         , makeGroup_ [ Button.icon Button.trailingPlacement FeatherIcons.edit2 ]
         , makeGroup_ [ Button.icon Button.only FeatherIcons.edit2 ]
+        , makeGroup_ [ Button.shadow True ]
         ]
 
 

@@ -15,16 +15,19 @@ module Components.Button exposing
     , only
     , primary
     , secondary
+    , shadow
     , size
     , small
     , tertiary
     , trailingPlacement
     )
 
+import Components.Autocomplete exposing (Attribute)
 import FeatherIcons
 import Html exposing (Html)
 import Html.Attributes exposing (class, classList)
 import Html.Events
+import Maybe.Extra
 import Utils
 
 
@@ -41,6 +44,7 @@ type alias Config msg =
     , loading : Bool
     , icon : Maybe ButtonIcon
     , contentWidth : Bool
+    , shadow : Bool
     }
 
 
@@ -52,6 +56,7 @@ defaultConfig variant =
     , loading = False
     , icon = Nothing
     , contentWidth = False
+    , shadow = False
     }
 
 
@@ -132,6 +137,11 @@ icon placement icon_ =
     Attribute <| \c -> { c | icon = Just { placement = placement, icon = icon_ } }
 
 
+shadow : Bool -> Attribute msg
+shadow b =
+    Attribute <| \c -> { c | shadow = b }
+
+
 onClick : Html.Attribute msg -> Html.Attribute (Attribute msg)
 onClick =
     attribute >> Html.Events.onClick
@@ -167,7 +177,7 @@ type Variant
     | Ghost
 
 
-sizeClass :
+getSizeClass :
     Size
     ->
         { minWidth : String
@@ -175,7 +185,7 @@ sizeClass :
         , height : String
         , width : String
         }
-sizeClass size_ =
+getSizeClass size_ =
     case size_ of
         Small ->
             { minWidth = "min-w-[5rem]"
@@ -203,6 +213,35 @@ sizeClass size_ =
             , paddingX = "px-7"
             , height = "h-14"
             , width = "w-14"
+            }
+
+
+getVariantClass : Variant -> { class : String, shadowColor : Maybe String }
+getVariantClass variant =
+    case variant of
+        Primary ->
+            { class = "text-white bg-gradient-45-deg bg-[length:200%] bg-right hover:bg-left from-cyan-700 via-cyan-700 to-cyan-600"
+            , shadowColor = Just "shadow-cyan-800/30  hover:shadow-cyan-800/30"
+            }
+
+        Secondary ->
+            { class = "text-cyan-700 border-2 border-cyan-700 hover:shadow-md"
+            , shadowColor = Nothing
+            }
+
+        Tertiary ->
+            { class = "text-cyan-700 border-2 hover:border-cyan-700 hover:shadow-md"
+            , shadowColor = Nothing
+            }
+
+        Brand ->
+            { class = "text-white bg-gradient-45-deg bg-[length:200%] bg-right hover:bg-left from-fuchsia-800 via-fuchsia-800 to-fuchsia-600"
+            , shadowColor = Just "shadow-fuchsia-800/30 hover:shadow-fuchsia-800/30"
+            }
+
+        Ghost ->
+            { class = "rounded-lg text-cyan-700"
+            , shadowColor = Nothing
             }
 
 
@@ -255,37 +294,34 @@ view variant attrs text_ =
         config =
             makeConfig variant attrs |> normalizeConfig
 
-        sizeCls =
-            sizeClass config.size
+        sizeClass =
+            getSizeClass config.size
+
+        variantClass =
+            getVariantClass config.variant
+
+        shadowClass =
+            case ( variantClass.shadowColor, config.shadow ) of
+                ( Just color, True ) ->
+                    Just ("shadow-lg hover:shadow-md " ++ color)
+
+                _ ->
+                    Nothing
     in
     Utils.concatArgs Html.button
         [ [ class "leading-none text-sm font-semibold outline-none"
           , class "transition-all duration-200 ease-in-out"
           , class "focus:ring ring-offset-1 ring-cyan-700/20 active:scale-[0.97]"
-          , class sizeCls.height
+          , class sizeClass.height
           , classList
                 [ ( "rounded-2xl", variant /= Ghost )
-                , ( sizeCls.minWidth, not config.contentWidth && not (isIconOnly config) )
-                , ( sizeCls.paddingX, variant /= Ghost && not (isIconOnly config) )
-                , ( sizeCls.width, isIconOnly config )
+                , ( sizeClass.minWidth, not config.contentWidth && not (isIconOnly config) )
+                , ( sizeClass.paddingX, variant /= Ghost && not (isIconOnly config) )
+                , ( sizeClass.width, isIconOnly config )
                 ]
-          , class <|
-                case variant of
-                    Primary ->
-                        "text-white bg-gradient-45-deg bg-[length:200%] bg-right hover:bg-left from-cyan-700 via-cyan-700 to-cyan-600"
-
-                    Secondary ->
-                        "text-cyan-700 border-2 border-cyan-700 hover:shadow-md"
-
-                    Tertiary ->
-                        "text-cyan-700 border-2 hover:border-cyan-700 hover:shadow-md"
-
-                    Brand ->
-                        "text-white bg-gradient-45-deg bg-[length:200%] bg-right hover:bg-left from-fuchsia-800 via-fuchsia-800 to-fuchsia-600"
-
-                    Ghost ->
-                        "rounded-lg text-cyan-700"
+          , class variantClass.class
           ]
+        , Maybe.Extra.mapToList class shadowClass
         , config.buttonAttributes
         ]
         [ viewButtonContent config text_
