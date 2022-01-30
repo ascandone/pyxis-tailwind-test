@@ -144,6 +144,7 @@ viewButton =
         , Button.primary [ Button.size Button.medium ] "Text"
         , Button.primary [ Button.size Button.large ] "Text"
         , Button.primary [ Button.size Button.huge ] "Text"
+        , Button.primary [ Button.loading True ] "Text"
         ]
     , header "Secondary"
     , btnGroup
@@ -165,6 +166,7 @@ viewButton =
         , Button.brand [ Button.size Button.medium ] "Text"
         , Button.brand [ Button.size Button.large ] "Text"
         , Button.brand [ Button.size Button.huge ] "Text"
+        , Button.brand [ Button.loading True ] "Text"
         ]
     , header "Ghost"
     , btnGroup

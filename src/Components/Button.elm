@@ -4,6 +4,7 @@ module Components.Button exposing
     , ghost
     , huge
     , large
+    , loading
     , medium
     , onBlur
     , onClick
@@ -15,6 +16,7 @@ module Components.Button exposing
     , tertiary
     )
 
+import Heroicons.Outline
 import Html exposing (Html)
 import Html.Attributes exposing (class, classList)
 import Html.Events
@@ -24,6 +26,7 @@ import Utils
 type alias Config msg =
     { buttonAttributes : List (Html.Attribute msg)
     , size : Size
+    , loading : Bool
     }
 
 
@@ -31,11 +34,17 @@ defaultConfig : Config msg
 defaultConfig =
     { buttonAttributes = []
     , size = Medium
+    , loading = False
     }
 
 
 type Attribute msg
     = Attribute (Config msg -> Config msg)
+
+
+loading : Bool -> Attribute msg
+loading loading_ =
+    Attribute <| \c -> { c | loading = loading_ }
 
 
 attribute : Html.Attribute msg -> Attribute msg
@@ -151,10 +160,24 @@ view variant attrs text_ =
                 Ghost ->
                     "rounded-lg text-cyan-700"
         ]
-        [ Html.span
-            [ classList [ ( "border-b-2 border-transparent hover:border-cyan-700 py-1 mx-1 transition-color duration-100 ease-in-out", variant == Ghost ) ]
+        [ if config.loading then
+            viewSpinner
+
+          else
+            Html.span
+                [ classList [ ( "border-b-2 border-transparent hover:border-cyan-700 py-1 mx-1 transition-color duration-100 ease-in-out", variant == Ghost ) ]
+                ]
+                [ Html.text text_ ]
+        ]
+
+
+viewSpinner : Html msg
+viewSpinner =
+    Html.div [ class "flex justify-center w-full" ]
+        [ Html.div
+            [ class "rounded-full border-2 border-white/20 border-t-white h-6 w-6 animate-spin"
             ]
-            [ Html.text text_ ]
+            []
         ]
 
 
