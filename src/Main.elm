@@ -2,6 +2,7 @@ module Main exposing (main)
 
 import Browser
 import Components.Autocomplete as Autocomplete exposing (Model)
+import Components.Button as Button
 import Components.Label as Label
 import Components.TextArea as TextArea
 import Components.TextField as TextField
@@ -22,7 +23,8 @@ main =
 
 
 type Page
-    = TextField
+    = Button
+    | TextField
     | TextArea
     | Autocomplete
 
@@ -36,7 +38,7 @@ type alias Model =
 
 init : () -> ( Model, Cmd Msg )
 init _ =
-    ( { page = TextField
+    ( { page = Button
       , autocompleteModel = Autocomplete.init
       , autocompleteValue = Nothing
       }
@@ -101,7 +103,8 @@ view model =
         [ Html.map SetPage <|
             div [ class "mx-auto max-w-screen-lg px-4 py-4 flex gap-x-4" ]
                 (List.map (\c -> c model.page)
-                    [ viewPageLink TextField "TextField"
+                    [ viewPageLink Button "Button"
+                    , viewPageLink TextField "TextField"
                     , viewPageLink TextArea "TextArea"
 
                     -- , viewPageLink Autocomplete "Autocomplete"
@@ -116,6 +119,9 @@ view model =
 viewPage : Model -> List (Html Msg)
 viewPage model =
     case model.page of
+        Button ->
+            viewButton
+
         TextField ->
             viewTextField
 
@@ -124,6 +130,18 @@ viewPage model =
 
         Autocomplete ->
             viewAutocomplete model.autocompleteValue model.autocompleteModel
+
+
+viewButton : List (Html msg)
+viewButton =
+    [ div [ class "flex flex-col gap-y-8 items-start" ]
+        [ Button.primary [] "Text"
+        , Button.secondary [] "Text"
+        , Button.tertiary [] "Text"
+        , Button.brand [] "Text"
+        , Button.ghost [] "Text"
+        ]
+    ]
 
 
 viewTextField : List (Html msg)
