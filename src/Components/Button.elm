@@ -119,55 +119,86 @@ type Variant
     | Ghost
 
 
+minWidthClass : Size -> Html.Attribute msg
+minWidthClass size_ =
+    class <|
+        case size_ of
+            Small ->
+                "min-w-[5rem]"
+
+            Medium ->
+                "min-w-[7.5rem]"
+
+            Large ->
+                "min-w-[10rem]"
+
+            Huge ->
+                "min-w-[13.75rem]"
+
+
+sizeClass : Size -> Html.Attribute msg
+sizeClass size_ =
+    class <|
+        case size_ of
+            Small ->
+                "h-6"
+
+            Medium ->
+                "h-8"
+
+            Large ->
+                "h-10"
+
+            Huge ->
+                "h-14"
+
+
 view : Variant -> List (Attribute msg) -> String -> Html msg
 view variant attrs text_ =
     let
         config =
             makeConfig attrs
     in
-    Html.button
-        [ class "leading-none text-sm font-semibold outline-none"
-        , classList [ ( "rounded-2xl  px-4", variant /= Ghost ) ]
-        , class <|
-            case config.size of
-                Small ->
-                    "h-6 min-w-[5rem]"
+    Utils.concatArgs Html.button
+        [ [ class "leading-none text-sm font-semibold outline-none"
+          , class "transition-all duration-200 ease-in-out"
+          , class "focus:ring ring-offset-1 ring-cyan-700/20 active:scale-[0.97]"
+          , sizeClass config.size
+          , class <|
+                case variant of
+                    Primary ->
+                        "text-white bg-gradient-45-deg bg-[length:200%] bg-right hover:bg-left from-cyan-700 via-cyan-700 to-cyan-600"
 
-                Medium ->
-                    "h-8 min-w-[7.5rem]"
+                    Secondary ->
+                        "text-cyan-700 border-2 border-cyan-700 hover:shadow-md"
 
-                Large ->
-                    "h-10 min-w-[10rem]"
+                    Tertiary ->
+                        "text-cyan-700 border-2 hover:border-cyan-700 hover:shadow-md"
 
-                Huge ->
-                    "h-14 min-w-[13.75rem]"
-        , class "transition-all duration-200 ease-in-out"
-        , class "focus:ring ring-offset-1 ring-cyan-700/20 active:scale-[0.97]"
-        , class <|
-            case variant of
-                Primary ->
-                    "text-white bg-gradient-45-deg bg-[length:200%] bg-right hover:bg-left from-cyan-700 via-cyan-700 to-cyan-600"
+                    Brand ->
+                        "text-white bg-gradient-45-deg bg-[length:200%] bg-right hover:bg-left from-fuchsia-800 via-fuchsia-800 to-fuchsia-600"
 
-                Secondary ->
-                    "text-cyan-700 border-2 border-cyan-700 hover:shadow-md"
+                    Ghost ->
+                        "rounded-lg text-cyan-700"
+          ]
+        , case variant of
+            Ghost ->
+                []
 
-                Tertiary ->
-                    "text-cyan-700 border-2 hover:border-cyan-700 hover:shadow-md"
-
-                Brand ->
-                    "text-white bg-gradient-45-deg bg-[length:200%] bg-right hover:bg-left from-fuchsia-800 via-fuchsia-800 to-fuchsia-600"
-
-                Ghost ->
-                    "rounded-lg text-cyan-700"
+            _ ->
+                [ class "rounded-2xl  px-4"
+                , minWidthClass config.size
+                ]
+        , config.buttonAttributes
         ]
         [ if config.loading then
             viewSpinner
 
           else
-            Html.span
-                [ classList [ ( "border-b-2 border-transparent hover:border-cyan-700 py-1 mx-1 transition-color duration-100 ease-in-out", variant == Ghost ) ]
-                ]
-                [ Html.text text_ ]
+            viewTextContent
+                { isGhost = variant == Ghost
+                , text_ = text_
+                }
         ]
 
 
@@ -179,6 +210,14 @@ viewSpinner =
             ]
             []
         ]
+
+
+viewTextContent : { r | text_ : String, isGhost : Bool } -> Html msg
+viewTextContent { text_, isGhost } =
+    Html.span
+        [ classList [ ( "border-b-2 border-transparent hover:border-cyan-700 py-1 mx-1 transition-color duration-100 ease-in-out", isGhost ) ]
+        ]
+        [ Html.text text_ ]
 
 
 primary : List (Attribute msg) -> String -> Html msg
