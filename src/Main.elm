@@ -134,12 +134,44 @@ viewPage model =
 
 viewButton : List (Html msg)
 viewButton =
-    [ div [ class "flex flex-col gap-y-8 items-start" ]
-        [ Button.primary [] "Text"
-        , Button.secondary [] "Text"
-        , Button.tertiary [] "Text"
-        , Button.brand [] "Text"
-        , Button.ghost [] "Text"
+    let
+        btnGroup =
+            div [ class "flex gap-x-8 gap-y-3 items-start flex-wrap" ]
+    in
+    [ header "Primary"
+    , btnGroup
+        [ Button.primary [ Button.size Button.small ] "Text"
+        , Button.primary [ Button.size Button.medium ] "Text"
+        , Button.primary [ Button.size Button.large ] "Text"
+        , Button.primary [ Button.size Button.huge ] "Text"
+        ]
+    , header "Secondary"
+    , btnGroup
+        [ Button.secondary [ Button.size Button.small ] "Text"
+        , Button.secondary [ Button.size Button.medium ] "Text"
+        , Button.secondary [ Button.size Button.large ] "Text"
+        , Button.secondary [ Button.size Button.huge ] "Text"
+        ]
+    , header "Tertiary"
+    , btnGroup
+        [ Button.tertiary [ Button.size Button.small ] "Text"
+        , Button.tertiary [ Button.size Button.medium ] "Text"
+        , Button.tertiary [ Button.size Button.large ] "Text"
+        , Button.tertiary [ Button.size Button.huge ] "Text"
+        ]
+    , header "Brand"
+    , btnGroup
+        [ Button.brand [ Button.size Button.small ] "Text"
+        , Button.brand [ Button.size Button.medium ] "Text"
+        , Button.brand [ Button.size Button.large ] "Text"
+        , Button.brand [ Button.size Button.huge ] "Text"
+        ]
+    , header "Ghost"
+    , btnGroup
+        [ Button.ghost [ Button.size Button.small ] "Text"
+        , Button.ghost [ Button.size Button.medium ] "Text"
+        , Button.ghost [ Button.size Button.large ] "Text"
+        , Button.ghost [ Button.size Button.huge ] "Text"
         ]
     ]
 
