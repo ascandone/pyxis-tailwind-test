@@ -41,7 +41,9 @@ view =
             , Button.tertiary [ Button.size Button.medium ] "Text"
             , Button.tertiary [ Button.size Button.large ] "Text"
             , Button.tertiary [ Button.size Button.huge ] "Text"
-            , Button.tertiary [ Button.loading True ] "Text"
+            ]
+        , btnGroup
+            [ Button.tertiary [ Button.loading True ] "Text"
             ]
         ]
     , Section.section "Brand"
@@ -50,7 +52,9 @@ view =
             , Button.brand [ Button.size Button.medium ] "Text"
             , Button.brand [ Button.size Button.large ] "Text"
             , Button.brand [ Button.size Button.huge ] "Text"
-            , Button.brand [ Button.loading True ] "Text"
+            ]
+        , btnGroup
+            [ Button.brand [ Button.loading True ] "Text"
             ]
         ]
     , Section.section "Ghost"
