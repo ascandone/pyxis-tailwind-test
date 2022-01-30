@@ -152,6 +152,7 @@ viewButton =
         , Button.secondary [ Button.size Button.medium ] "Text"
         , Button.secondary [ Button.size Button.large ] "Text"
         , Button.secondary [ Button.size Button.huge ] "Text"
+        , Button.secondary [ Button.loading True ] "Text"
         ]
     , header "Tertiary"
     , btnGroup
@@ -159,6 +160,7 @@ viewButton =
         , Button.tertiary [ Button.size Button.medium ] "Text"
         , Button.tertiary [ Button.size Button.large ] "Text"
         , Button.tertiary [ Button.size Button.huge ] "Text"
+        , Button.tertiary [ Button.loading True ] "Text"
         ]
     , header "Brand"
     , btnGroup
@@ -174,6 +176,13 @@ viewButton =
         , Button.ghost [ Button.size Button.medium ] "Text"
         , Button.ghost [ Button.size Button.large ] "Text"
         , Button.ghost [ Button.size Button.huge ] "Text"
+        ]
+    , header "Loading"
+    , btnGroup
+        [ Button.primary [ Button.loading True, Button.size Button.small ] "Text"
+        , Button.primary [ Button.loading True, Button.size Button.medium ] "Text"
+        , Button.primary [ Button.loading True, Button.size Button.large ] "Text"
+        , Button.primary [ Button.loading True, Button.size Button.huge ] "Text"
         ]
     ]
 

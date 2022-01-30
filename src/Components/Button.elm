@@ -191,8 +191,8 @@ view variant attrs text_ =
                 ]
         , config.buttonAttributes
         ]
-        [ if config.loading then
-            viewSpinner
+        [ if config.loading && variant /= Ghost then
+            viewSpinner variant config
 
           else
             viewTextContent
@@ -202,11 +202,49 @@ view variant attrs text_ =
         ]
 
 
-viewSpinner : Html msg
-viewSpinner =
+isBackgroundFilled : Variant -> Bool
+isBackgroundFilled variant =
+    case variant of
+        Primary ->
+            True
+
+        Secondary ->
+            False
+
+        Tertiary ->
+            False
+
+        Brand ->
+            True
+
+        Ghost ->
+            False
+
+
+viewSpinner : Variant -> { r | size : Size } -> Html msg
+viewSpinner variant config =
     Html.div [ class "flex justify-center w-full" ]
         [ Html.div
-            [ class "rounded-full border-2 border-white/20 border-t-white h-6 w-6 animate-spin"
+            [ class "rounded-full border-2 animate-spin"
+            , class <|
+                if isBackgroundFilled variant then
+                    "border-white/20 border-t-white"
+
+                else
+                    "border-cyan-800/20 border-t-cyan-800"
+            , class <|
+                case config.size of
+                    Small ->
+                        "h-4 w-4"
+
+                    Medium ->
+                        "h-5 w-5"
+
+                    Large ->
+                        "h-6 w-6"
+
+                    Huge ->
+                        "h-7 w-7"
             ]
             []
         ]
