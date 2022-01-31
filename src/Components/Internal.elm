@@ -26,9 +26,9 @@ formFieldClass { validation, disabled } =
         , ( formFieldRadiusClass, True )
         , ( formFieldTransitionClass, True )
         , ( stateClass
-                { disabled = "bg-neutral-100 border-neutral-200 placeholder:text-neutral-400"
-                , error = "bg-neutral-100 border-neutral-200 placeholder:text-neutral-400"
-                , default = "border-red-500  focus-within:ring ring-red-200 text-red-800 placeholder:text-red-200"
+                { default = "focus-within:border-cyan-600 hover:border-cyan-600 focus-within:ring ring-cyan-200 text-gray-900"
+                , disabled = "bg-neutral-100 border-neutral-200 placeholder:text-neutral-400"
+                , error = "border-red-500  focus-within:ring ring-red-200 text-red-800 placeholder:text-red-200"
                 }
           , True
           )
