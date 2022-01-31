@@ -443,14 +443,6 @@ viewSpinner config =
         ]
 
 
-viewTextContent : { r | text_ : String, isGhost : Bool } -> Html msg
-viewTextContent { text_, isGhost } =
-    Html.span
-        [ classList [ ( "border-b-2 border-transparent hover:border-cyan-700 py-1 mx-1 transition-color duration-100 ease-in-out", isGhost ) ]
-        ]
-        [ Html.text text_ ]
-
-
 primary : List (Attribute msg) -> String -> Html msg
 primary =
     view Primary
