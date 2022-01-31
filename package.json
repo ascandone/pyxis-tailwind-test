@@ -4,6 +4,7 @@
   "license": "MIT",
   "scripts": {
     "dev": "parcel index.html",
+    "dev:validation-example": "parcel examples/validation.html",
     "build": "parcel build index.html",
     "test": "elm-test",
     "test:watch": "elm-test --watch"

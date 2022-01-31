@@ -1,4 +1,4 @@
-module Components.TextField exposing
+module Components.Input exposing
     ( AddonPlacement
     , Attribute
     , Size

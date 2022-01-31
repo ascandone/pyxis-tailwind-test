@@ -26,7 +26,7 @@ type Attribute msg
 
 
 type alias Config msg =
-    { textFieldAttributes : List (Html.Attribute msg)
+    { attributes : List (Html.Attribute msg)
     , validation : Result String ()
     , disabled : Bool
     , id : Maybe String
@@ -36,7 +36,7 @@ type alias Config msg =
 
 defaultConfig : Config msg
 defaultConfig =
-    { textFieldAttributes = []
+    { attributes = []
     , validation = Ok ()
     , disabled = False
     , id = Nothing
@@ -46,7 +46,7 @@ defaultConfig =
 
 inputAttribute : Html.Attribute msg -> Attribute msg
 inputAttribute attr =
-    Attribute <| \c -> { c | textFieldAttributes = attr :: c.textFieldAttributes }
+    Attribute <| \c -> { c | attributes = attr :: c.attributes }
 
 
 value : String -> Attribute msg
@@ -133,7 +133,7 @@ view attrs =
                       , class Internal.formFieldRadiusClass
                       , Html.Attributes.disabled config.disabled
                       ]
-                    , config.textFieldAttributes
+                    , config.attributes
                     ]
                     []
                 ]

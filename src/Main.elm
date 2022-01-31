@@ -6,9 +6,8 @@ import Html.Attributes exposing (class)
 import Html.Events exposing (onClick)
 import Page.Autocomplete
 import Page.Button
+import Page.Input
 import Page.TextArea
-import Page.TextField
-import Page.Validation
 import Section
 
 
@@ -24,25 +23,22 @@ main =
 
 type Page
     = Button
-    | TextField
+    | Input
     | TextArea
     | Autocomplete
-    | Validation
 
 
 type alias Model =
     { page : Page
     , autocompletePage : Page.Autocomplete.Model
-    , validationPage : Page.Validation.Model
     }
 
 
 init : () -> ( Model, Cmd Msg )
 init _ =
     -- TODO edit initial page
-    ( { page = Validation
+    ( { page = Button
       , autocompletePage = Page.Autocomplete.init
-      , validationPage = Page.Validation.init
       }
     , Cmd.none
     )
@@ -51,7 +47,6 @@ init _ =
 type Msg
     = SetPage Page
     | AutocompletePageMsg Page.Autocomplete.Msg
-    | ValidationPageMsg Page.Validation.Msg
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -69,11 +64,6 @@ update msg model =
             in
             ( { model | autocompletePage = newModel }
             , Cmd.map AutocompletePageMsg cmd
-            )
-
-        ValidationPageMsg subMsg ->
-            ( { model | validationPage = Page.Validation.update subMsg model.validationPage }
-            , Cmd.none
             )
 
 
@@ -95,9 +85,8 @@ viewPageLink thisPage text_ currentPage =
 pagesTabs : List (Page -> Html Page)
 pagesTabs =
     [ viewPageLink Button "Button"
-    , viewPageLink TextField "TextField"
+    , viewPageLink Input "Input"
     , viewPageLink TextArea "TextArea"
-    , viewPageLink Validation "Validation"
     ]
 
 
@@ -118,8 +107,8 @@ viewPage model =
         Button ->
             Section.view Page.Button.view
 
-        TextField ->
-            Section.view Page.TextField.view
+        Input ->
+            Section.view Page.Input.view
 
         TextArea ->
             Section.view Page.TextArea.view
@@ -127,7 +116,3 @@ viewPage model =
         Autocomplete ->
             Section.view (Page.Autocomplete.view model.autocompletePage)
                 |> Html.map AutocompletePageMsg
-
-        Validation ->
-            Section.view (Page.Validation.view model.validationPage)
-                |> Html.map ValidationPageMsg

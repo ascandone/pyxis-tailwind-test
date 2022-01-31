@@ -1,7 +1,8 @@
-module Components.ValidatedTextField exposing
+module Components.InputValidation exposing
     ( Model
     , Msg(..)
     , ValidationStrategy
+    , field
     , getData
     , getValue
     , init
@@ -13,7 +14,7 @@ module Components.ValidatedTextField exposing
     , withValue
     )
 
-import Components.TextField as TextField
+import Components.Input as Input
 import FormState exposing (FormState)
 import Html exposing (Html)
 import Utils
@@ -140,15 +141,15 @@ getValidation maybeResult =
             Result.map (\_ -> ()) res
 
 
-view : Model x -> List (TextField.Attribute Msg) -> Html Msg
+view : Model x -> List (Input.Attribute Msg) -> Html Msg
 view (Model model) attrs =
-    Utils.concatArgs TextField.view
+    Utils.concatArgs Input.view
         [ attrs
-        , [ TextField.value model.value
-          , TextField.onInput Input
-          , TextField.onBlur Blur
-          , TextField.onFocus Focus
-          , TextField.validation (getValidation model.validation)
+        , [ Input.value model.value
+          , Input.onInput Input
+          , Input.onBlur Blur
+          , Input.onFocus Focus
+          , Input.validation (getValidation model.validation)
           ]
         ]
 
@@ -173,5 +174,17 @@ validateOnBlurStrategy { formState, msg, currentValidation, runValidation } =
         ( _, Input _, Just (Err _) ) ->
             Just (runValidation ())
 
+        ( _, Input _, _ ) ->
+            Just (runValidation ())
+
         _ ->
             currentValidation
+
+
+
+-- Experimental
+
+
+field : form -> (form -> Model data) -> Maybe (data -> a) -> Maybe a
+field form getter =
+    Maybe.map2 (|>) (getData (getter form))
