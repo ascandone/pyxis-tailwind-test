@@ -8,7 +8,7 @@ getMakeConfig :
     -> List attribute
     -> config
 getMakeConfig args =
-    List.foldl (\attr conf -> args.unwrap attr conf) args.defaultConfig
+    List.foldr (\attr conf -> args.unwrap attr conf) args.defaultConfig
 
 
 concatArgs : (List a -> b) -> List (List a) -> b
