@@ -119,9 +119,6 @@ view model =
                 [ TextField.placeholder "Età"
                 ]
                 |> Html.map AgeTextFieldMsg
-            , TextField.view
-                [ TextField.placeholder "Età"
-                ]
             , Button.primary
                 [ Button.size Button.large
                 , Button.type_ Button.submit
