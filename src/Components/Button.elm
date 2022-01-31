@@ -330,7 +330,7 @@ view variant attrs text_ =
     Utils.concatArgs Html.button
         [ [ class "leading-none text-sm font-semibold outline-none"
           , class "transition-all duration-200 ease-in-out"
-          , class "focus:ring ring-offset-1 ring-cyan-700/20 active:scale-[0.97] disabled:shadow-none disabled:hover:shadow-none"
+          , class "focus:ring ring-offset-1 ring-cyan-700/20 active:scale-[0.97] disabled:active:transform-none disabled:shadow-none disabled:hover:shadow-none"
           , class variantClass.class
           , class disabledClass
           , class sizeClass.height
