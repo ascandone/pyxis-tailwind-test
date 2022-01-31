@@ -51,7 +51,7 @@ type alias FormData =
 type alias Model =
     { age : InputValidation.Model Int
     , name : InputValidation.Model String
-    , submittedData : Maybe FormData
+    , submittedData : List FormData
     }
 
 
@@ -59,7 +59,7 @@ init : Model
 init =
     { name = InputValidation.init
     , age = InputValidation.init
-    , submittedData = Nothing
+    , submittedData = []
     }
 
 
@@ -86,7 +86,15 @@ update msg model =
             { model | name = InputValidation.update validateName subMsg model.name }
 
         Submit ->
-            { model | submittedData = parseForm model }
+            { model
+                | submittedData =
+                    case parseForm model of
+                        Nothing ->
+                            model.submittedData
+
+                        Just formData ->
+                            formData :: model.submittedData
+            }
 
 
 
@@ -100,11 +108,17 @@ view model =
         , Html.div [ class "h-4" ] []
         , Html.hr [] []
         , Html.div [ class "h-4" ] []
-        , Html.div [ class "overflow-x-auto" ]
-            [ Html.text "Submitted data: \""
-            , Html.pre [ class "inline" ] [ Html.text (Debug.toString model.submittedData) ]
-            , Html.text "\""
-            ]
+        , Html.ul [ class "overflow-x-auto list-disc" ]
+            (model.submittedData
+                |> List.map
+                    (\data ->
+                        Html.li []
+                            [ Html.text "Submitted data: \""
+                            , Html.pre [ class "inline" ] [ Html.text (Debug.toString data) ]
+                            , Html.text "\""
+                            ]
+                    )
+            )
         ]
 
 
