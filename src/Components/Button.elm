@@ -2,6 +2,7 @@ module Components.Button exposing
     ( Attribute
     , brand
     , contentWidth
+    , disabled
     , ghost
     , huge
     , icon
@@ -77,6 +78,11 @@ contentWidth b =
 attribute : Html.Attribute msg -> Attribute msg
 attribute attr =
     Attribute <| \c -> { c | buttonAttributes = attr :: c.buttonAttributes }
+
+
+disabled : Bool -> Attribute msg
+disabled =
+    attribute << Html.Attributes.disabled
 
 
 type Size
@@ -279,7 +285,13 @@ normalizeConfig config =
     case config.variant of
         Ghost ->
             { config
-                | icon = Nothing
+                | icon =
+                    case Maybe.map .placement config.icon of
+                        Just Only ->
+                            Nothing
+
+                        _ ->
+                            config.icon
                 , loading = False
                 , contentWidth = True
             }
@@ -307,11 +319,20 @@ view variant attrs text_ =
 
                 _ ->
                     Nothing
+
+        disabledClass =
+            if isBackgroundFilled config.variant then
+                "disabled:from-transparent disabled:to-transparent disabled:bg-neutral-200 disabled:text-neutral-500"
+
+            else
+                "disabled:border-neutral-200 disabled:text-neutral-500"
     in
     Utils.concatArgs Html.button
         [ [ class "leading-none text-sm font-semibold outline-none"
           , class "transition-all duration-200 ease-in-out"
-          , class "focus:ring ring-offset-1 ring-cyan-700/20 active:scale-[0.97]"
+          , class "focus:ring ring-offset-1 ring-cyan-700/20 active:scale-[0.97] disabled:shadow-none disabled:hover:shadow-none"
+          , class variantClass.class
+          , class disabledClass
           , class sizeClass.height
           , classList
                 [ ( "rounded-2xl", variant /= Ghost )
@@ -319,7 +340,6 @@ view variant attrs text_ =
                 , ( sizeClass.paddingX, variant /= Ghost && not (isIconOnly config) )
                 , ( sizeClass.width, isIconOnly config )
                 ]
-          , class variantClass.class
           ]
         , Maybe.Extra.mapToList class shadowClass
         , config.buttonAttributes
@@ -353,18 +373,22 @@ viewButtonContent config text_ =
     else
         let
             textContent =
-                viewTextContent
-                    { isGhost = config.variant == Ghost
-                    , text_ = text_
-                    }
+                Html.span [] [ Html.text text_ ]
         in
         case config.icon of
             Nothing ->
                 textContent
 
             Just btnIcon ->
-                Html.div [ class "flex items-center justify-center gap-x-1" ] <|
-                    case btnIcon.placement of
+                Html.div
+                    [ classList
+                        [ ( "flex items-center justify-center gap-x-1.5", True )
+                        , ( "border-b-2 border-transparent hover:border-cyan-700 py-1 mx-1 transition-color duration-100 ease-in-out"
+                          , config.variant == Ghost
+                          )
+                        ]
+                    ]
+                    (case btnIcon.placement of
                         Only ->
                             [ viewIcon btnIcon config
                             ]
@@ -378,18 +402,12 @@ viewButtonContent config text_ =
                             [ textContent
                             , viewIcon btnIcon config
                             ]
+                    )
 
 
 viewIcon : ButtonIcon -> { r | size : Size, variant : Variant } -> Html msg
 viewIcon btnIcon config =
-    Html.i
-        [ class <|
-            if isBackgroundFilled config.variant then
-                "text-white"
-
-            else
-                "text-cyan-700/90"
-        ]
+    Html.i []
         [ btnIcon.icon
             |> setIconSize config.size
             |> FeatherIcons.toHtml []
