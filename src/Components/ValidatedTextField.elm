@@ -5,6 +5,7 @@ module Components.ValidatedTextField exposing
     , getData
     , getValue
     , init
+    , initWithInitial
     , update
     , updateWithCustomStrategy
     , validateOnBlurStrategy
@@ -31,17 +32,24 @@ type Model data
     = Model
         { formState : FormState
         , value : String
+        , initialValue : String
         , validation : Maybe (Result String data)
+        }
+
+
+initWithInitial : String -> Model data
+initWithInitial intialValue =
+    Model
+        { formState = FormState.Untouched
+        , value = intialValue
+        , initialValue = intialValue
+        , validation = Nothing
         }
 
 
 init : Model data
 init =
-    Model
-        { formState = FormState.Untouched
-        , value = ""
-        , validation = Nothing
-        }
+    initWithInitial ""
 
 
 getValue : Model data -> String
