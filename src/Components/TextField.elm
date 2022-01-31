@@ -238,10 +238,10 @@ viewInput config =
           , class <|
                 case config.size of
                     Medium ->
-                        "px-4 py-4"
+                        "px-4 h-11"
 
                     Small ->
-                        "px-3 py-2"
+                        "px-3 h-8"
           , Html.Attributes.disabled config.disabled
           ]
         , config.inputAttributes
