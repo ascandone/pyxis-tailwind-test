@@ -8,6 +8,7 @@ import Page.Autocomplete
 import Page.Button
 import Page.TextArea
 import Page.TextField
+import Page.Validation
 import Section
 
 
@@ -26,18 +27,22 @@ type Page
     | TextField
     | TextArea
     | Autocomplete
+    | Validation
 
 
 type alias Model =
     { page : Page
     , autocompletePage : Page.Autocomplete.Model
+    , validationPage : Page.Validation.Model
     }
 
 
 init : () -> ( Model, Cmd Msg )
 init _ =
-    ( { page = Button
+    -- TODO edit initial page
+    ( { page = Validation
       , autocompletePage = Page.Autocomplete.init
+      , validationPage = Page.Validation.init
       }
     , Cmd.none
     )
@@ -46,6 +51,7 @@ init _ =
 type Msg
     = SetPage Page
     | AutocompletePageMsg Page.Autocomplete.Msg
+    | ValidationPageMsg Page.Validation.Msg
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -65,6 +71,11 @@ update msg model =
             , Cmd.map AutocompletePageMsg cmd
             )
 
+        ValidationPageMsg subMsg ->
+            ( { model | validationPage = Page.Validation.update subMsg model.validationPage }
+            , Cmd.none
+            )
+
 
 viewPageLink : Page -> String -> Page -> Html Page
 viewPageLink thisPage text_ currentPage =
@@ -81,17 +92,21 @@ viewPageLink thisPage text_ currentPage =
         [ text text_ ]
 
 
+pagesTabs : List (Page -> Html Page)
+pagesTabs =
+    [ viewPageLink Button "Button"
+    , viewPageLink TextField "TextField"
+    , viewPageLink TextArea "TextArea"
+    , viewPageLink Validation "Validation"
+    ]
+
+
 view : Model -> Html Msg
 view model =
     div []
         [ Html.map SetPage <|
             div [ class "mx-auto overflow-x-auto max-w-screen-lg px-4 py-4 my-4 flex gap-x-4" ]
-                (List.map (\c -> c model.page)
-                    [ viewPageLink Button "Button"
-                    , viewPageLink TextField "TextField"
-                    , viewPageLink TextArea "TextArea"
-                    ]
-                )
+                (List.map (\c -> c model.page) pagesTabs)
         , viewPage model
         , div [ class "h-10" ] []
         ]
@@ -112,3 +127,7 @@ viewPage model =
         Autocomplete ->
             Section.view (Page.Autocomplete.view model.autocompletePage)
                 |> Html.map AutocompletePageMsg
+
+        Validation ->
+            Section.view (Page.Validation.view model.validationPage)
+                |> Html.map ValidationPageMsg

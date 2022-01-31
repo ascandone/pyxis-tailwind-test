@@ -2,19 +2,27 @@ module Components.TextField exposing
     ( AddonPlacement
     , Attribute
     , Size
+    , Type
     , addon
     , disabled
+    , email
     , iconAddon
     , id
     , label
     , leading
     , medium
+    , number
+    , onBlur
+    , onFocus
     , onInput
+    , password
     , placeholder
     , size
     , small
+    , text
     , textAddon
     , trailing
+    , type_
     , validation
     , value
     , view
@@ -44,6 +52,7 @@ type alias Config msg =
     , addon : Maybe Addon
     , label : Maybe LabelInternal.Label
     , id : Maybe String
+    , type_ : Type
     }
 
 
@@ -56,7 +65,42 @@ defaultConfig =
     , addon = Nothing
     , label = Nothing
     , id = Nothing
+    , type_ = text
     }
+
+
+type Type
+    = Type String
+
+
+unwrapType : Type -> Html.Attribute msg
+unwrapType (Type t) =
+    Html.Attributes.type_ t
+
+
+text : Type
+text =
+    Type "text"
+
+
+number : Type
+number =
+    Type "number"
+
+
+email : Type
+email =
+    Type "email"
+
+
+password : Type
+password =
+    Type "password"
+
+
+type_ : Type -> Attribute msg
+type_ t =
+    Attribute <| \c -> { c | type_ = t }
 
 
 id : String -> Attribute msg
@@ -146,15 +190,15 @@ type alias Addon =
 
 
 addon : AddonPlacement -> AddonType -> Attribute msg
-addon placement type_ =
-    Attribute <| \c -> { c | addon = Just { placement = placement, type_ = type_ } }
+addon placement addonType =
+    Attribute <| \c -> { c | addon = Just { placement = placement, type_ = addonType } }
 
 
 label : Label.Position -> Label.Type -> Attribute msg
-label position type_ =
+label position addonType =
     let
         label_ =
-            case type_ of
+            case addonType of
                 LabelInternal.Single l1 ->
                     { position = position
                     , label = l1
@@ -177,6 +221,16 @@ label position type_ =
 onInput : (String -> msg) -> Attribute msg
 onInput =
     inputAttribute << Html.Events.onInput
+
+
+onBlur : msg -> Attribute msg
+onBlur =
+    inputAttribute << Html.Events.onBlur
+
+
+onFocus : msg -> Attribute msg
+onFocus =
+    inputAttribute << Html.Events.onFocus
 
 
 
@@ -243,6 +297,7 @@ viewInput config =
                     Small ->
                         "px-3 h-8"
           , Html.Attributes.disabled config.disabled
+          , unwrapType config.type_
           ]
         , config.inputAttributes
         , Maybe.mapToList Html.Attributes.id config.id
@@ -251,7 +306,7 @@ viewInput config =
 
 
 viewAddon : Config msg -> Addon -> Html msg
-viewAddon config { type_, placement } =
+viewAddon config addon_ =
     let
         commonCls =
             class <|
@@ -271,7 +326,7 @@ viewAddon config { type_, placement } =
                     """
                     }
     in
-    case type_ of
+    case addon_.type_ of
         TextAddon text_ ->
             Html.div
                 [ class "transition-color flex items-center"
@@ -285,7 +340,7 @@ viewAddon config { type_, placement } =
                 , commonCls
                 , class Internal.formFieldTransitionClass
                 , class <|
-                    case placement of
+                    case addon_.placement of
                         Leading ->
                             "border-r"
 
@@ -299,7 +354,7 @@ viewAddon config { type_, placement } =
             Html.span
                 [ class "flex items-center"
                 , class <|
-                    case ( placement, config.size ) of
+                    case ( addon_.placement, config.size ) of
                         ( Leading, Small ) ->
                             "pl-3"
 

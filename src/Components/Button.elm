@@ -1,6 +1,7 @@
 module Components.Button exposing
     ( Attribute
     , brand
+    , button
     , contentWidth
     , disabled
     , ghost
@@ -13,14 +14,17 @@ module Components.Button exposing
     , onBlur
     , onClick
     , onFocus
+    , onSubmit
     , only
     , primary
     , secondary
     , shadow
     , size
     , small
+    , submit
     , tertiary
     , trailingPlacement
+    , type_
     )
 
 import Components.Autocomplete exposing (Attribute)
@@ -46,6 +50,7 @@ type alias Config msg =
     , icon : Maybe ButtonIcon
     , contentWidth : Bool
     , shadow : Bool
+    , type_ : Type
     }
 
 
@@ -58,11 +63,36 @@ defaultConfig variant =
     , icon = Nothing
     , contentWidth = False
     , shadow = False
+    , type_ = button
     }
 
 
 type Attribute msg
     = Attribute (Config msg -> Config msg)
+
+
+type Type
+    = Type String
+
+
+unwrapType : Type -> Html.Attribute msg
+unwrapType (Type t) =
+    Html.Attributes.type_ t
+
+
+button : Type
+button =
+    Type "button"
+
+
+submit : Type
+submit =
+    Type "submit"
+
+
+type_ : Type -> Attribute msg
+type_ t =
+    Attribute <| \c -> { c | type_ = t }
 
 
 loading : Bool -> Attribute msg
@@ -148,19 +178,24 @@ shadow b =
     Attribute <| \c -> { c | shadow = b }
 
 
-onClick : Html.Attribute msg -> Html.Attribute (Attribute msg)
+onClick : msg -> Attribute msg
 onClick =
-    attribute >> Html.Events.onClick
+    attribute << Html.Events.onClick
 
 
-onFocus : Html.Attribute msg -> Html.Attribute (Attribute msg)
+onSubmit : msg -> Attribute msg
+onSubmit =
+    attribute << Html.Events.onSubmit
+
+
+onFocus : msg -> Attribute msg
 onFocus =
-    attribute >> Html.Events.onClick
+    attribute << Html.Events.onClick
 
 
-onBlur : Html.Attribute msg -> Html.Attribute (Attribute msg)
+onBlur : msg -> Attribute msg
 onBlur =
-    attribute >> Html.Events.onClick
+    attribute << Html.Events.onClick
 
 
 
@@ -340,6 +375,7 @@ view variant attrs text_ =
                 , ( sizeClass.paddingX, variant /= Ghost && not (isIconOnly config) )
                 , ( sizeClass.width, isIconOnly config )
                 ]
+          , unwrapType config.type_
           ]
         , Maybe.Extra.mapToList class shadowClass
         , config.buttonAttributes
