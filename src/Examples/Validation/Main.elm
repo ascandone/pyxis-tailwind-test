@@ -42,11 +42,17 @@ jobValidation =
     allCharsAlpha "Job cannot contain special chars"
 
 
+idValidation : Validation String String
+idValidation =
+    Validation.String.notEmpty "Required field"
+
+
 type alias FormData =
     { name : String
     , age : Int
     , date : Date
     , job : Maybe String
+    , id : Maybe String
     }
 
 
@@ -55,6 +61,7 @@ type alias Model =
     , age : InputValidation.Model Int
     , date : InputValidation.Model Date
     , job : InputValidation.Model (Maybe String)
+    , id : InputValidation.Model (Maybe String)
     , submittedData : List FormData
     }
 
@@ -65,6 +72,9 @@ init =
     , age = InputValidation.empty ageValidation
     , date = InputValidation.empty Date.fromIsoString
     , job = InputValidation.empty (Validation.String.optional jobValidation)
+    , id =
+        InputValidation.init "initial-id" idValidation
+            |> InputValidation.detectChanges
     , submittedData = []
     }
 
@@ -74,6 +84,7 @@ type Msg
     | NameInputMsg InputValidation.Msg
     | DateInput InputValidation.Msg
     | JobInput InputValidation.Msg
+    | IdInput InputValidation.Msg
     | Submit
 
 
@@ -84,6 +95,7 @@ parseForm =
         |> FormParser.input .age
         |> FormParser.input .date
         |> FormParser.input .job
+        |> FormParser.input .id
 
 
 update : Msg -> Model -> Model
@@ -100,6 +112,9 @@ update msg model =
 
         JobInput subMsg ->
             { model | job = InputValidation.update subMsg model.job }
+
+        IdInput subMsg ->
+            { model | id = InputValidation.update subMsg model.id }
 
         Submit ->
             model
@@ -138,6 +153,11 @@ viewForm model =
             , Input.label Label.vertical (Label.double "Job" "Optional field")
             ]
             |> Html.map JobInput
+        , InputValidation.view model.id
+            [ Input.placeholder "Id"
+            , Input.label Label.vertical (Label.double "Id" "Only when changed")
+            ]
+            |> Html.map IdInput
         , Btn.primary
             [ Btn.size Btn.large
             , Btn.type_ Btn.submit

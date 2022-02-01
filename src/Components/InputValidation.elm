@@ -2,6 +2,7 @@ module Components.InputValidation exposing
     ( Model
     , Msg(..)
     , ValidationMessageStrategy
+    , detectChanges
     , empty
     , field
     , getData
@@ -48,6 +49,25 @@ init initialValue validation =
         , initialValue = initialValue
         , validation = validation
         , showValidation = False
+        }
+
+
+detectChanges : Model data -> Model (Maybe data)
+detectChanges (Model model) =
+    let
+        validation str =
+            if str == model.initialValue then
+                Ok Nothing
+
+            else
+                Result.map Just (model.validation str)
+    in
+    Model
+        { formState = model.formState
+        , value = model.value
+        , showValidation = model.showValidation
+        , initialValue = model.initialValue
+        , validation = validation
         }
 
 
