@@ -194,12 +194,3 @@ validateOnBlurStrategy { formState, msg, previousValidation } =
 
         _ ->
             Nothing
-
-
-
--- Experimental
-
-
-field : form -> (form -> Model data) -> Maybe (data -> a) -> Maybe a
-field form getter =
-    Maybe.map2 (|>) (getData (getter form))
