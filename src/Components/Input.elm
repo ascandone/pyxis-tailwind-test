@@ -16,6 +16,7 @@ module Components.Input exposing
     , onBlur
     , onFocus
     , onInput
+    , onKeyDown
     , password
     , placeholder
     , size
@@ -36,6 +37,7 @@ import FeatherIcons
 import Html exposing (Html)
 import Html.Attributes exposing (class)
 import Html.Events
+import Html.Events.Extra
 import Html.Extra as Html
 import Maybe.Extra as Maybe
 import Utils
@@ -237,6 +239,11 @@ onBlur =
 onFocus : msg -> Attribute msg
 onFocus =
     inputAttribute << Html.Events.onFocus
+
+
+onKeyDown : (Html.Events.Extra.KeydownEvent -> msg) -> Attribute msg
+onKeyDown =
+    inputAttribute << Html.Events.Extra.onKeyDown
 
 
 
