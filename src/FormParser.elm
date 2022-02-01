@@ -9,8 +9,8 @@ module FormParser exposing
 import Components.InputValidation as InputValidation
 
 
-type alias Field fieldData model data =
-    (model -> Maybe (fieldData -> data)) -> model -> Maybe data
+type alias Field field model data =
+    (model -> Maybe (field -> data)) -> model -> Maybe data
 
 
 succeed : value -> model -> Maybe value
@@ -18,16 +18,16 @@ succeed value _ =
     Just value
 
 
-required : (model -> Maybe fieldData) -> Field fieldData model data
+required : (model -> Maybe field) -> Field field model data
 required getFieldData f model =
     Maybe.map2 (<|) (f model) (getFieldData model)
 
 
-hardcoded : fieldData -> Field fieldData model data
-hardcoded fieldData =
-    required (\_ -> Just fieldData)
+hardcoded : field -> Field field model data
+hardcoded field =
+    required (\_ -> Just field)
 
 
-input : (model -> InputValidation.Model fieldData) -> Field fieldData model data
+input : (model -> InputValidation.Model field) -> Field field model data
 input getter =
     required (InputValidation.getData << getter)
