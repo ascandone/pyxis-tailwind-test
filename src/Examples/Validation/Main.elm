@@ -166,7 +166,7 @@ viewForm model =
             |> Html.map JobInput
         , InputValidation.view model.id
             [ Input.placeholder "Id"
-            , Input.label Label.vertical (Label.double "Id" "Only when changed")
+            , Input.label Label.vertical (Label.double "Id" "Null, unless different from default value")
             , Input.onKeyDown (InputValidation.Custom << KeyDown)
             ]
             |> Html.map IdInput
