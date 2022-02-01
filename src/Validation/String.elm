@@ -13,7 +13,7 @@ notEmpty =
     Validation.fromPredicate (not << String.isEmpty)
 
 
-trim : Validation String String -> Validation String String
+trim : Validation String String
 trim =
     Validation.map String.trim
 

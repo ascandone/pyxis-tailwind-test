@@ -29,6 +29,6 @@ fromMaybe reason mX =
             Ok x
 
 
-map : (a -> b) -> Validation from a -> Validation from b
-map f validation from =
-    Result.map f (validation from)
+map : (from -> to) -> Validation from to
+map f from =
+    Ok (f from)
