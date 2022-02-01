@@ -10,6 +10,7 @@ import FormParser
 import Html exposing (Html)
 import Html.Attributes exposing (class)
 import Html.Events
+import Json.Encode as Enc
 import Validation exposing (Validation)
 import Validation.Int
 import Validation.String
@@ -181,6 +182,37 @@ viewForm model =
 -- Boilerplate
 
 
+nullable : (a -> Enc.Value) -> Maybe a -> Enc.Value
+nullable f m =
+    case m of
+        Nothing ->
+            Enc.null
+
+        Just x ->
+            f x
+
+
+encodeForm : FormData -> Enc.Value
+encodeForm formData =
+    Enc.object
+        [ ( "name", Enc.string formData.name )
+        , ( "age", Enc.int formData.age )
+        , ( "date", Enc.string (Date.toIsoString formData.date) )
+        , ( "job", nullable Enc.string formData.job )
+        , ( "id", nullable Enc.string formData.id )
+        ]
+
+
+encodeFormDataResult : Result String FormData -> Enc.Value
+encodeFormDataResult res =
+    case res of
+        Err err ->
+            Enc.string ("ERR: " ++ err)
+
+        Ok d ->
+            encodeForm d
+
+
 view : Model -> Html Msg
 view model =
     Html.div [ class "px-6 py-6" ]
@@ -188,14 +220,13 @@ view model =
         , Html.div [ class "h-4" ] []
         , Html.hr [] []
         , Html.div [ class "h-4" ] []
+        , Html.text "Submitted data: "
         , Html.ul [ class "overflow-x-auto list-disc" ]
             (model.submittedData
                 |> List.map
                     (\data ->
                         Html.li []
-                            [ Html.text "Submitted data: \""
-                            , Html.pre [ class "inline" ] [ Html.text (Debug.toString data) ]
-                            , Html.text "\""
+                            [ Html.pre [ class "inline" ] [ Html.text (Enc.encode 2 (encodeFormDataResult data)) ]
                             ]
                     )
             )
