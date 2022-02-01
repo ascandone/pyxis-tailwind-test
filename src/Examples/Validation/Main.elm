@@ -6,6 +6,7 @@ import Components.Input as Input
 import Components.InputValidation as InputValidation
 import Components.Label as Label
 import Date exposing (Date)
+import Email
 import FormParser
 import Html exposing (Html)
 import Html.Attributes exposing (class)
@@ -16,21 +17,24 @@ import Validation.Int
 import Validation.String
 
 
-nameValidation : Validation String String
-nameValidation raw =
-    Ok raw
-        |> Result.andThen (Validation.String.notEmpty "Required field")
-        |> Result.andThen Validation.String.trim
-        |> Result.andThen (Validation.String.notEmpty "Insert a valid name")
+requiredFieldValidation : Validation String String
+requiredFieldValidation =
+    Validation.String.notEmpty "Required field"
 
 
-ageValidation : Validation String Int
-ageValidation raw =
-    Ok raw
-        |> Result.andThen (Validation.String.notEmpty "Required field")
-        |> Result.andThen (Validation.String.toInt "Expected an integer")
-        |> Result.andThen (Validation.Int.min 18 "Age must be >= 18")
-        |> Result.andThen (Validation.Int.max 100 "Age must be <= 100")
+nameFieldValidation : Validation String String
+nameFieldValidation =
+    requiredFieldValidation
+        >> Result.andThen Validation.String.trim
+        >> Result.andThen (Validation.String.notEmpty "Insert a valid name")
+
+
+ageFieldValidation : Validation String Int
+ageFieldValidation =
+    requiredFieldValidation
+        >> Result.andThen (Validation.String.toInt "Expected an integer")
+        >> Result.andThen (Validation.Int.min 18 "Age must be >= 18")
+        >> Result.andThen (Validation.Int.max 100 "Age must be <= 100")
 
 
 allCharsAlpha : String -> Validation String String
@@ -38,14 +42,25 @@ allCharsAlpha =
     Validation.fromPredicate (String.all Char.isAlpha)
 
 
-jobValidation : Validation String String
-jobValidation =
+jobFieldValidation : Validation String String
+jobFieldValidation =
     allCharsAlpha "Job cannot contain special chars"
 
 
 idValidation : Validation String String
 idValidation =
-    Validation.String.notEmpty "Required field"
+    requiredFieldValidation
+
+
+emailValidation : Validation String Email.EmailAddress
+emailValidation =
+    Email.parse >> Result.mapError (always "Insert a valid email")
+
+
+emailFieldValidation : Validation String Email.EmailAddress
+emailFieldValidation =
+    requiredFieldValidation
+        >> Result.andThen emailValidation
 
 
 type alias FormData =
@@ -54,6 +69,7 @@ type alias FormData =
     , date : Date
     , job : Maybe String
     , id : Maybe String
+    , email : Email.EmailAddress
     }
 
 
@@ -63,19 +79,21 @@ type alias Model =
     , date : InputValidation.Model Date
     , job : InputValidation.Model (Maybe String)
     , id : InputValidation.Model (Maybe String)
+    , email : InputValidation.Model Email.EmailAddress
     , submittedData : List (Result String FormData)
     }
 
 
 init : Model
 init =
-    { name = InputValidation.empty nameValidation
-    , age = InputValidation.empty ageValidation
+    { name = InputValidation.empty nameFieldValidation
+    , age = InputValidation.empty ageFieldValidation
     , date = InputValidation.empty Date.fromIsoString
-    , job = InputValidation.empty (Validation.String.optional jobValidation)
+    , job = InputValidation.empty (Validation.String.optional jobFieldValidation)
     , id =
         InputValidation.init "initial-id" idValidation
             |> InputValidation.detectChanges
+    , email = InputValidation.empty emailFieldValidation
     , submittedData = []
     }
 
@@ -90,6 +108,7 @@ type Msg
     | DateInput InputValidation.Msg
     | JobInput InputValidation.Msg
     | IdInput (InputValidation.GeneralMsg IdInputMsg)
+    | EmailInput InputValidation.Msg
     | Submit
 
 
@@ -101,6 +120,7 @@ parseForm =
         |> FormParser.input .date
         |> FormParser.input .job
         |> FormParser.input .id
+        |> FormParser.input .email
 
 
 update : Msg -> Model -> Model
@@ -121,6 +141,9 @@ update msg model =
         IdInput subMsg ->
             { model | id = InputValidation.update subMsg model.id }
 
+        EmailInput subMsg ->
+            { model | email = InputValidation.update subMsg model.email }
+
         Submit ->
             model
                 |> update (AgeInput InputValidation.Submit)
@@ -128,6 +151,7 @@ update msg model =
                 |> update (DateInput InputValidation.Submit)
                 |> update (JobInput InputValidation.Submit)
                 |> update (IdInput InputValidation.Submit)
+                |> update (EmailInput InputValidation.Submit)
                 |> submitData
 
 
@@ -170,6 +194,12 @@ viewForm model =
             , Input.onKeyDown (InputValidation.Custom << KeyDown)
             ]
             |> Html.map IdInput
+        , InputValidation.view model.email
+            [ Input.placeholder "example@mail.com"
+            , Input.label Label.vertical (Label.single "Email")
+            , Input.type_ Input.email
+            ]
+            |> Html.map EmailInput
         , Btn.primary
             [ Btn.size Btn.large
             , Btn.type_ Btn.submit
