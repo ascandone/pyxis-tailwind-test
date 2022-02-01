@@ -29,6 +29,7 @@ validateAge raw =
         |> Result.andThen (Validation.String.notEmpty "Required field")
         |> Result.andThen (Validation.String.toInt "Expected an integer")
         |> Result.andThen (Validation.Int.min 18 "Age must be >= 18")
+        |> Result.andThen (Validation.Int.max 100 "Age must be <= 100")
 
 
 type alias FormData =
