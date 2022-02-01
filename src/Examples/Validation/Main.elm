@@ -15,16 +15,16 @@ import Validation.Int
 import Validation.String
 
 
-validateName : String -> Result String String
-validateName raw =
+nameValidation : String -> Result String String
+nameValidation raw =
     Ok raw
         |> Result.andThen (Validation.String.notEmpty "Required field")
         |> Result.andThen Validation.String.trim
         |> Result.andThen (Validation.String.notEmpty "Insert a valid name")
 
 
-validateAge : Validation String Int
-validateAge raw =
+ageValidation : Validation String Int
+ageValidation raw =
     Ok raw
         |> Result.andThen (Validation.String.notEmpty "Required field")
         |> Result.andThen (Validation.String.toInt "Expected an integer")
@@ -32,10 +32,21 @@ validateAge raw =
         |> Result.andThen (Validation.Int.max 100 "Age must be <= 100")
 
 
+allCharsAlpha : String -> Validation String String
+allCharsAlpha =
+    Validation.fromPredicate (String.all Char.isAlpha)
+
+
+jobValidation : Validation String String
+jobValidation =
+    allCharsAlpha "Job cannot contain special chars"
+
+
 type alias FormData =
     { name : String
     , age : Int
     , date : Date
+    , job : Maybe String
     }
 
 
@@ -43,15 +54,17 @@ type alias Model =
     { name : InputValidation.Model String
     , age : InputValidation.Model Int
     , date : InputValidation.Model Date
+    , job : InputValidation.Model (Maybe String)
     , submittedData : List FormData
     }
 
 
 init : Model
 init =
-    { name = InputValidation.empty validateName
-    , age = InputValidation.empty validateAge
+    { name = InputValidation.empty nameValidation
+    , age = InputValidation.empty ageValidation
     , date = InputValidation.empty Date.fromIsoString
+    , job = InputValidation.empty (Validation.String.optional jobValidation)
     , submittedData = []
     }
 
@@ -60,6 +73,7 @@ type Msg
     = AgeInputMsg InputValidation.Msg
     | NameInputMsg InputValidation.Msg
     | DateInput InputValidation.Msg
+    | JobInput InputValidation.Msg
     | Submit
 
 
@@ -69,6 +83,7 @@ parseForm =
         |> FormParser.input .name
         |> FormParser.input .age
         |> FormParser.input .date
+        |> FormParser.input .job
 
 
 update : Msg -> Model -> Model
@@ -83,11 +98,15 @@ update msg model =
         DateInput subMsg ->
             { model | date = InputValidation.update subMsg model.date }
 
+        JobInput subMsg ->
+            { model | job = InputValidation.update subMsg model.job }
+
         Submit ->
             model
                 |> update (AgeInputMsg InputValidation.Submit)
                 |> update (NameInputMsg InputValidation.Submit)
                 |> update (DateInput InputValidation.Submit)
+                |> update (JobInput InputValidation.Submit)
                 |> submitData
 
 
@@ -114,6 +133,11 @@ viewForm model =
             , Input.type_ Input.date
             ]
             |> Html.map DateInput
+        , InputValidation.view model.job
+            [ Input.placeholder "Job (alpha chars only)"
+            , Input.label Label.vertical (Label.double "Job" "Optional field")
+            ]
+            |> Html.map JobInput
         , Btn.primary
             [ Btn.size Btn.large
             , Btn.type_ Btn.submit
