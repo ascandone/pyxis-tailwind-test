@@ -145,7 +145,7 @@ viewForm model =
     Html.form [ class "space-y-6", Html.Events.onSubmit Submit ]
         [ InputValidation.view model.name
             [ Input.placeholder "John Doe"
-            , Input.label Label.vertical (Label.single "Name")
+            , Input.label Label.vertical (Label.double "Name" "Gets trimmed")
             ]
             |> Html.map NameInput
         , InputValidation.view model.age
