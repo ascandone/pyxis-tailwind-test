@@ -1,6 +1,7 @@
 module Components.InputValidation exposing
-    ( Model
-    , Msg(..)
+    ( GeneralMsg(..)
+    , Model
+    , Msg
     , ValidationMessageStrategy
     , detectChanges
     , empty
@@ -22,14 +23,19 @@ import Utils
 import Validation exposing (Validation)
 
 
+type alias Msg =
+    GeneralMsg Never
+
+
 {-| Non-opaque by design
 Keep variants exposed
 -}
-type Msg
+type GeneralMsg customMsg
     = Focus
     | Input String
     | Blur
     | Submit
+    | Custom customMsg
 
 
 type Model data
@@ -92,15 +98,15 @@ validate (Model { validation, value }) =
     validation value
 
 
-type alias ValidationMessageStrategy data =
+type alias ValidationMessageStrategy data customMsg =
     { formState : FormState
-    , msg : Msg
+    , msg : GeneralMsg customMsg
     , previousValidation : Result String data
     }
     -> Maybe Bool
 
 
-updateWithCustomStrategy : ValidationMessageStrategy data -> Msg -> Model data -> Model data
+updateWithCustomStrategy : ValidationMessageStrategy data customMsg -> GeneralMsg customMsg -> Model data -> Model data
 updateWithCustomStrategy strategy msg (Model model) =
     let
         newModel =
@@ -123,6 +129,9 @@ updateWithCustomStrategy strategy msg (Model model) =
 
                 Submit ->
                     model
+
+                Custom _ ->
+                    model
     in
     Model
         { newModel
@@ -141,12 +150,12 @@ updateWithCustomStrategy strategy msg (Model model) =
         }
 
 
-update : Msg -> Model data -> Model data
+update : GeneralMsg customMsg -> Model data -> Model data
 update =
     updateWithCustomStrategy validateOnBlurStrategy
 
 
-view : Model x -> List (Input.Attribute Msg) -> Html Msg
+view : Model x -> List (Input.Attribute (GeneralMsg customMsg)) -> Html (GeneralMsg customMsg)
 view (Model model) attrs =
     Utils.concatArgs Input.view
         [ attrs
@@ -167,7 +176,7 @@ view (Model model) attrs =
 -- Default strategies
 
 
-validateOnBlurStrategy : ValidationMessageStrategy value
+validateOnBlurStrategy : ValidationMessageStrategy value customMsg
 validateOnBlurStrategy { formState, msg, previousValidation } =
     case ( formState, msg, previousValidation ) of
         ( _, Blur, _ ) ->

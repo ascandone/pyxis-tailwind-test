@@ -79,12 +79,16 @@ init =
     }
 
 
+type IdInputMsg
+    = KeyDown { keyCode : Int }
+
+
 type Msg
     = AgeInput InputValidation.Msg
     | NameInput InputValidation.Msg
     | DateInput InputValidation.Msg
     | JobInput InputValidation.Msg
-    | IdInput InputValidation.Msg
+    | IdInput (InputValidation.GeneralMsg IdInputMsg)
     | Submit
 
 
@@ -162,6 +166,7 @@ viewForm model =
         , InputValidation.view model.id
             [ Input.placeholder "Id"
             , Input.label Label.vertical (Label.double "Id" "Only when changed")
+            , Input.onKeyDown (InputValidation.Custom << KeyDown)
             ]
             |> Html.map IdInput
         , Btn.primary
