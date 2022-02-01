@@ -15,7 +15,7 @@ import Validation.Int
 import Validation.String
 
 
-nameValidation : String -> Result String String
+nameValidation : Validation String String
 nameValidation raw =
     Ok raw
         |> Result.andThen (Validation.String.notEmpty "Required field")
