@@ -192,13 +192,6 @@ validateOnBlurStrategy { formState, msg, previousValidation } =
         ( _, Blur, _ ) ->
             Just True
 
-        ( FormState.Touched { blurredAtLeastOnce }, Input _, Err _ ) ->
-            if blurredAtLeastOnce then
-                Just True
-
-            else
-                Nothing
-
         ( _, Submit, _ ) ->
             Just True
 
