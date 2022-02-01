@@ -5,7 +5,6 @@ module Components.InputValidation exposing
     , ValidationMessageStrategy
     , detectChanges
     , empty
-    , field
     , getData
     , getValue
     , init
