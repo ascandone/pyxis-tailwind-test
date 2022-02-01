@@ -4,6 +4,7 @@ module Components.Input exposing
     , Size
     , Type
     , addon
+    , date
     , disabled
     , email
     , iconAddon
@@ -96,6 +97,11 @@ email =
 password : Type
 password =
     Type "password"
+
+
+date : Type
+date =
+    Type "date"
 
 
 type_ : Type -> Attribute msg
