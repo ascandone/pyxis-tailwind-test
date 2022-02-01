@@ -4,10 +4,14 @@ import Browser
 import Components.Button as Btn
 import Components.Input as Input
 import Components.InputValidation as InputValidation
+import Components.Label as Label
 import FormParser
 import Html exposing (Html)
 import Html.Attributes exposing (class)
 import Html.Events
+import Validation exposing (Validation)
+import Validation.Int
+import Validation.String
 
 
 main : Program () Model Msg
@@ -20,26 +24,17 @@ main =
 
 
 validateName : String -> Result String String
-validateName str =
-    if String.length str < 2 then
-        Err "Len < 2"
-
-    else
-        Ok str
+validateName raw =
+    Ok raw
+        |> Result.andThen (Validation.String.notEmpty "Required field")
 
 
-validateAge : String -> Result String Int
-validateAge str =
-    case String.toInt str of
-        Nothing ->
-            Err "Expected an int"
-
-        Just n ->
-            if n < 18 then
-                Err "Age must be >= 18"
-
-            else
-                Ok n
+validateAge : Validation String Int
+validateAge raw =
+    Ok raw
+        |> Result.andThen (Validation.String.notEmpty "Required field")
+        |> Result.andThen (Validation.String.toInt "Expected an integer")
+        |> Result.andThen (Validation.Int.min 18 "Age must be >= 18")
 
 
 type alias FormData =
@@ -49,16 +44,16 @@ type alias FormData =
 
 
 type alias Model =
-    { age : InputValidation.Model Int
-    , name : InputValidation.Model String
+    { name : InputValidation.Model String
+    , age : InputValidation.Model Int
     , submittedData : List FormData
     }
 
 
 init : Model
 init =
-    { name = InputValidation.init
-    , age = InputValidation.init
+    { name = InputValidation.empty validateName
+    , age = InputValidation.empty validateAge
     , submittedData = []
     }
 
@@ -76,25 +71,33 @@ parseForm =
         |> FormParser.input .age
 
 
+submitData : Model -> Model
+submitData model =
+    { model
+        | submittedData =
+            case parseForm model of
+                Nothing ->
+                    model.submittedData
+
+                Just formData ->
+                    formData :: model.submittedData
+    }
+
+
 update : Msg -> Model -> Model
 update msg model =
     case msg of
         AgeInputMsg subMsg ->
-            { model | age = InputValidation.update validateAge subMsg model.age }
+            { model | age = InputValidation.update subMsg model.age }
 
         NameInputMsg subMsg ->
-            { model | name = InputValidation.update validateName subMsg model.name }
+            { model | name = InputValidation.update subMsg model.name }
 
         Submit ->
-            { model
-                | submittedData =
-                    case parseForm model of
-                        Nothing ->
-                            model.submittedData
-
-                        Just formData ->
-                            formData :: model.submittedData
-            }
+            model
+                |> update (AgeInputMsg InputValidation.Submit)
+                |> update (NameInputMsg InputValidation.Submit)
+                |> submitData
 
 
 
@@ -103,7 +106,7 @@ update msg model =
 
 view : Model -> Html Msg
 view model =
-    Html.div [ class "px-6 py-2" ]
+    Html.div [ class "px-6 py-6" ]
         [ viewForm model
         , Html.div [ class "h-4" ] []
         , Html.hr [] []
@@ -126,18 +129,21 @@ viewForm : Model -> Html Msg
 viewForm model =
     Html.form [ class "space-y-6", Html.Events.onSubmit Submit ]
         [ InputValidation.view model.name
-            [ Input.placeholder "Nome"
+            [ Input.placeholder "John Doe"
+            , Input.label Label.vertical (Label.single "Name")
             ]
             |> Html.map NameInputMsg
         , InputValidation.view model.age
-            [ Input.placeholder "Età"
+            [ Input.placeholder "Age"
+            , Input.label Label.vertical (Label.double "Age" "At least 18 years old")
             , Input.type_ Input.number
             ]
             |> Html.map AgeInputMsg
         , Btn.primary
             [ Btn.size Btn.large
             , Btn.type_ Btn.submit
-            , Btn.disabled (parseForm model == Nothing)
+
+            -- , Btn.disabled (parseForm model == Nothing)
             ]
             "Submit"
         ]

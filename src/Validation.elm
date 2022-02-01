@@ -2,6 +2,7 @@ module Validation exposing
     ( Validation
     , fromMaybe
     , fromPredicate
+    , map
     )
 
 
@@ -26,3 +27,8 @@ fromMaybe reason mX =
 
         Just x ->
             Ok x
+
+
+map : (a -> b) -> Validation from a -> Validation from b
+map f validation from =
+    Result.map f (validation from)

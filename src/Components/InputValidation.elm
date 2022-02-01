@@ -1,23 +1,23 @@
 module Components.InputValidation exposing
     ( Model
     , Msg(..)
-    , ValidationStrategy
+    , ValidationMessageStrategy
+    , empty
     , field
     , getData
     , getValue
     , init
-    , initWithInitial
     , update
     , updateWithCustomStrategy
     , validateOnBlurStrategy
     , view
-    , withValue
     )
 
 import Components.Input as Input
 import FormState exposing (FormState)
 import Html exposing (Html)
 import Utils
+import Validation exposing (Validation)
 
 
 {-| Non-opaque by design
@@ -27,6 +27,7 @@ type Msg
     = Focus
     | Input String
     | Blur
+    | Submit
 
 
 type Model data
@@ -34,23 +35,25 @@ type Model data
         { formState : FormState
         , value : String
         , initialValue : String
-        , validation : Maybe (Result String data)
+        , validation : Validation String data
+        , showValidation : Bool
         }
 
 
-initWithInitial : String -> Model data
-initWithInitial intialValue =
+init : String -> Validation String data -> Model data
+init initialValue validation =
     Model
         { formState = FormState.Untouched
-        , value = intialValue
-        , initialValue = intialValue
-        , validation = Nothing
+        , value = initialValue
+        , initialValue = initialValue
+        , validation = validation
+        , showValidation = False
         }
 
 
-init : Model data
-init =
-    initWithInitial ""
+empty : Validation String data -> Model data
+empty =
+    init ""
 
 
 getValue : Model data -> String
@@ -59,46 +62,20 @@ getValue (Model { value }) =
 
 
 getData : Model data -> Maybe data
-getData (Model { validation }) =
-    Maybe.andThen Result.toMaybe validation
+getData (Model { validation, value }) =
+    Result.toMaybe (validation value)
 
 
-withValue : String -> Model data -> Model data
-withValue value (Model data) =
-    Model { data | value = value }
-
-
-type alias ValidationStrategy data =
+type alias ValidationMessageStrategy data =
     { formState : FormState
     , msg : Msg
-    , currentValidation : Maybe (Result String data)
-    , runValidation : () -> Result String data
+    , previousValidation : Result String data
     }
-    -> Maybe (Result String data)
+    -> Maybe Bool
 
 
-refreshValidation :
-    { validate : String -> Result String data
-    , validationStrategy : ValidationStrategy data
-    , msg : Msg
-    }
-    -> Model data
-    -> Model data
-refreshValidation { validate, validationStrategy, msg } (Model model) =
-    Model
-        { model
-            | validation =
-                validationStrategy
-                    { formState = model.formState
-                    , msg = msg
-                    , currentValidation = model.validation
-                    , runValidation = \() -> validate model.value
-                    }
-        }
-
-
-updateWithCustomStrategy : ValidationStrategy data -> (String -> Result String data) -> Msg -> Model data -> Model data
-updateWithCustomStrategy strategy validate msg (Model model) =
+updateWithCustomStrategy : ValidationMessageStrategy data -> Msg -> Model data -> Model data
+updateWithCustomStrategy strategy msg (Model model) =
     let
         newModel =
             case msg of
@@ -117,28 +94,30 @@ updateWithCustomStrategy strategy validate msg (Model model) =
                     { model
                         | formState = FormState.focus model.formState
                     }
+
+                Submit ->
+                    model
     in
-    refreshValidation
-        { validate = validate
-        , validationStrategy = strategy
-        , msg = msg
+    Model
+        { newModel
+            | showValidation =
+                case newModel.validation newModel.value of
+                    Ok _ ->
+                        False
+
+                    Err _ ->
+                        strategy
+                            { formState = newModel.formState
+                            , msg = msg
+                            , previousValidation = model.validation model.value
+                            }
+                            |> Maybe.withDefault newModel.showValidation
         }
-        (Model newModel)
 
 
-update : (String -> Result String data) -> Msg -> Model data -> Model data
+update : Msg -> Model data -> Model data
 update =
     updateWithCustomStrategy validateOnBlurStrategy
-
-
-getValidation : Maybe (Result String x) -> Result String ()
-getValidation maybeResult =
-    case maybeResult of
-        Nothing ->
-            Ok ()
-
-        Just res ->
-            Result.map (\_ -> ()) res
 
 
 view : Model x -> List (Input.Attribute Msg) -> Html Msg
@@ -149,7 +128,11 @@ view (Model model) attrs =
           , Input.onInput Input
           , Input.onBlur Blur
           , Input.onFocus Focus
-          , Input.validation (getValidation model.validation)
+          , if model.showValidation then
+                Input.validation (model.validation model.value)
+
+            else
+                Input.validation (Ok ())
           ]
         ]
 
@@ -158,27 +141,24 @@ view (Model model) attrs =
 -- Default strategies
 
 
-validateOnBlurStrategy : ValidationStrategy value
-validateOnBlurStrategy { formState, msg, currentValidation, runValidation } =
-    case ( formState, msg, currentValidation ) of
-        ( FormState.Touched data, Blur, _ ) ->
-            if data.dirty then
-                Just (runValidation ())
+validateOnBlurStrategy : ValidationMessageStrategy value
+validateOnBlurStrategy { formState, msg, previousValidation } =
+    case ( formState, msg, previousValidation ) of
+        ( _, Blur, _ ) ->
+            Just True
+
+        ( FormState.Touched { blurredAtLeastOnce }, Input _, Err _ ) ->
+            if blurredAtLeastOnce then
+                Just True
 
             else
-                currentValidation
+                Nothing
 
-        ( _, Blur, _ ) ->
-            Just (runValidation ())
-
-        ( _, Input _, Just (Err _) ) ->
-            Just (runValidation ())
-
-        ( _, Input _, _ ) ->
-            Just (runValidation ())
+        ( _, Submit, _ ) ->
+            Just True
 
         _ ->
-            currentValidation
+            Nothing
 
 
 

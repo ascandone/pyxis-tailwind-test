@@ -1,4 +1,4 @@
-module Maybe.Extra exposing (andThen, mapToList)
+module Maybe.Extra exposing (andMap, mapToList)
 
 
 mapToList : (a -> b) -> Maybe a -> List b
@@ -11,6 +11,6 @@ mapToList f m =
             [ f x ]
 
 
-andThen : Maybe a -> Maybe (a -> b) -> Maybe b
-andThen =
+andMap : Maybe a -> Maybe (a -> b) -> Maybe b
+andMap =
     Maybe.map2 (|>)
