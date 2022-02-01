@@ -1,4 +1,4 @@
-module Examples.Validation.Main exposing (main)
+module Examples.Validation.Main exposing (main, passwordValidation)
 
 import Browser
 import Components.Button as Btn
@@ -57,6 +57,11 @@ emailFieldValidation =
     Validation.String.toEmail "Insert a valid email"
 
 
+passwordValidation : String -> Result String String
+passwordValidation =
+    Validation.String.minLength 6 "Password needs at least 6 characters"
+
+
 type alias FormData =
     { name : String
     , age : Int
@@ -74,6 +79,8 @@ type alias Model =
     , job : InputValidation.Model (Maybe String)
     , id : InputValidation.Model (Maybe String)
     , email : InputValidation.Model (Maybe Email.EmailAddress)
+    , password : InputValidation.Model String
+    , confirmPassword : InputValidation.Model String
     , submittedData : List (Result String FormData)
     }
 
@@ -88,6 +95,8 @@ init =
         InputValidation.init "initial-id" idValidation
             |> InputValidation.detectChanges
     , email = InputValidation.empty (Validation.String.optional emailFieldValidation)
+    , password = InputValidation.empty passwordValidation
+    , confirmPassword = InputValidation.empty passwordValidation
     , submittedData = []
     }
 
@@ -103,6 +112,8 @@ type Msg
     | JobInput InputValidation.Msg
     | IdInput (InputValidation.GeneralMsg IdInputMsg)
     | EmailInput InputValidation.Msg
+    | PasswordInput InputValidation.Msg
+    | ConfirmPasswordInput InputValidation.Msg
     | Submit
 
 
@@ -148,6 +159,12 @@ update msg model =
         EmailInput subMsg ->
             { model | email = InputValidation.update subMsg model.email }
 
+        PasswordInput subMsg ->
+            { model | password = InputValidation.update subMsg model.password }
+
+        ConfirmPasswordInput subMsg ->
+            { model | confirmPassword = InputValidation.update subMsg model.confirmPassword }
+
         Submit ->
             model
                 |> update (AgeInput InputValidation.Submit)
@@ -156,6 +173,8 @@ update msg model =
                 |> update (JobInput InputValidation.Submit)
                 |> update (IdInput InputValidation.Submit)
                 |> update (EmailInput InputValidation.Submit)
+                |> update (PasswordInput InputValidation.Submit)
+                |> update (ConfirmPasswordInput InputValidation.Submit)
                 |> submitData
 
 
@@ -204,6 +223,17 @@ viewForm model =
             , Input.type_ Input.email
             ]
             |> Html.map EmailInput
+        , InputValidation.view model.password
+            [ Input.label Label.vertical (Label.single "Password")
+            , Input.type_ Input.password
+            ]
+            |> Html.map PasswordInput
+
+        -- , InputValidation.view model.confirmPassword
+        --     [ Input.label Label.vertical (Label.single "Confirm password")
+        --     , Input.type_ Input.password
+        --     ]
+        --     |> Html.map ConfirmPasswordInput
         , Btn.primary
             [ Btn.size Btn.large
             , Btn.type_ Btn.submit

@@ -1,5 +1,7 @@
 module Validation.String exposing
-    ( notEmpty
+    ( maxLength
+    , minLength
+    , notEmpty
     , optional
     , toEmail
     , toInt
@@ -12,7 +14,17 @@ import Validation exposing (Validation)
 
 notEmpty : String -> Validation String String
 notEmpty =
-    Validation.fromPredicate (not << String.isEmpty)
+    minLength 1
+
+
+minLength : Int -> String -> Validation String String
+minLength l =
+    Validation.fromPredicate (\s -> String.length s >= l)
+
+
+maxLength : Int -> String -> Validation String String
+maxLength l =
+    Validation.fromPredicate (\s -> String.length s <= l)
 
 
 trim : Validation String String
