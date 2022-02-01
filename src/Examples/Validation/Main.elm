@@ -122,6 +122,7 @@ update msg model =
                 |> update (NameInput InputValidation.Submit)
                 |> update (DateInput InputValidation.Submit)
                 |> update (JobInput InputValidation.Submit)
+                |> update (IdInput InputValidation.Submit)
                 |> submitData
 
 
