@@ -1,33 +1,29 @@
 module FormParser exposing
-    ( Field
-    , hardcoded
+    ( hardcoded
     , input
     , required
     , succeed
     )
 
 import Components.InputValidation as InputValidation
+import Validation exposing (Validation)
 
 
-type alias Field field model data =
-    (model -> Maybe (field -> data)) -> model -> Maybe data
-
-
-succeed : value -> model -> Maybe value
+succeed : value -> Validation model value
 succeed value _ =
-    Just value
+    Ok value
 
 
-required : (model -> Maybe field) -> Field field model data
+required : Validation model field -> Validation model (field -> data) -> Validation model data
 required getFieldData f model =
-    Maybe.map2 (<|) (f model) (getFieldData model)
+    Result.map2 (<|) (f model) (getFieldData model)
 
 
-hardcoded : field -> Field field model data
+hardcoded : field -> Validation model (field -> data) -> Validation model data
 hardcoded field =
-    required (\_ -> Just field)
+    required (\_ -> Ok field)
 
 
-input : (model -> InputValidation.Model field) -> Field field model data
+input : (model -> InputValidation.Model field) -> Validation model (field -> data) -> Validation model data
 input getter =
-    required (InputValidation.getData << getter)
+    required (InputValidation.validate << getter)

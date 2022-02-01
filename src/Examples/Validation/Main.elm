@@ -62,7 +62,7 @@ type alias Model =
     , date : InputValidation.Model Date
     , job : InputValidation.Model (Maybe String)
     , id : InputValidation.Model (Maybe String)
-    , submittedData : List FormData
+    , submittedData : List (Result String FormData)
     }
 
 
@@ -88,7 +88,7 @@ type Msg
     | Submit
 
 
-parseForm : Model -> Maybe FormData
+parseForm : Validation Model FormData
 parseForm =
     FormParser.succeed FormData
         |> FormParser.input .name
@@ -124,6 +124,11 @@ update msg model =
                 |> update (JobInput InputValidation.Submit)
                 |> update (IdInput InputValidation.Submit)
                 |> submitData
+
+
+submitData : Model -> Model
+submitData model =
+    { model | submittedData = parseForm model :: model.submittedData }
 
 
 
@@ -190,19 +195,6 @@ view model =
                     )
             )
         ]
-
-
-submitData : Model -> Model
-submitData model =
-    { model
-        | submittedData =
-            case parseForm model of
-                Nothing ->
-                    model.submittedData
-
-                Just formData ->
-                    formData :: model.submittedData
-    }
 
 
 main : Program () Model Msg

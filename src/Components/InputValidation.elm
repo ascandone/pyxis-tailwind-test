@@ -10,6 +10,7 @@ module Components.InputValidation exposing
     , init
     , update
     , updateWithCustomStrategy
+    , validate
     , validateOnBlurStrategy
     , view
     )
@@ -84,6 +85,11 @@ getValue (Model { value }) =
 getData : Model data -> Maybe data
 getData (Model { validation, value }) =
     Result.toMaybe (validation value)
+
+
+validate : Model data -> Result String data
+validate (Model { validation, value }) =
+    validation value
 
 
 type alias ValidationMessageStrategy data =
