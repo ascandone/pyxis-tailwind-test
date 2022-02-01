@@ -6,7 +6,8 @@
     "dev": "parcel index.html",
     "dev:validation-example": "parcel examples/validation.html",
     "build:validation-example": "parcel build examples/validation.html",
-    "build": "parcel build index.html",
+    "build:main": "parcel build index.html",
+    "build": "npm run build:main && npm run build:validation-example",
     "test": "elm-test",
     "test:watch": "elm-test --watch"
   },
