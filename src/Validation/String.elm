@@ -4,7 +4,5 @@ import Validation exposing (Validation)
 
 
 notEmpty : String -> Validation String String
-notEmpty reason =
-    Validation.fromPredicate
-        (not << String.isEmpty)
-        reason
+notEmpty =
+    Validation.fromPredicate (not << String.isEmpty)
