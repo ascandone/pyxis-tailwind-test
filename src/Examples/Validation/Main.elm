@@ -87,6 +87,7 @@ update msg model =
             model
                 |> update (AgeInputMsg InputValidation.Submit)
                 |> update (NameInputMsg InputValidation.Submit)
+                |> update (DateInput InputValidation.Submit)
                 |> submitData
 
 
