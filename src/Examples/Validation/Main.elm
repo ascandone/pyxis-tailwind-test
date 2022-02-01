@@ -52,15 +52,9 @@ idValidation =
     requiredFieldValidation
 
 
-emailValidation : Validation String Email.EmailAddress
-emailValidation =
-    Email.parse >> Result.mapError (always "Insert a valid email")
-
-
 emailFieldValidation : Validation String Email.EmailAddress
 emailFieldValidation =
-    requiredFieldValidation
-        >> Result.andThen emailValidation
+    Validation.String.toEmail "Insert a valid email"
 
 
 type alias FormData =

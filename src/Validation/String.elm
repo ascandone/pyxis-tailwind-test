@@ -1,10 +1,12 @@
 module Validation.String exposing
     ( notEmpty
     , optional
+    , toEmail
     , toInt
     , trim
     )
 
+import Email
 import Validation exposing (Validation)
 
 
@@ -35,3 +37,8 @@ toInt reason raw =
 
         Just n ->
             Ok n
+
+
+toEmail : String -> Validation String Email.EmailAddress
+toEmail message =
+    Email.parse >> Result.mapError (always message)
