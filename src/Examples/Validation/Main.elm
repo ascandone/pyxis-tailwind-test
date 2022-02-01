@@ -63,7 +63,7 @@ type alias FormData =
     , date : Date
     , job : Maybe String
     , id : Maybe String
-    , email : Email.EmailAddress
+    , email : Maybe Email.EmailAddress
     }
 
 
@@ -73,7 +73,7 @@ type alias Model =
     , date : InputValidation.Model Date
     , job : InputValidation.Model (Maybe String)
     , id : InputValidation.Model (Maybe String)
-    , email : InputValidation.Model Email.EmailAddress
+    , email : InputValidation.Model (Maybe Email.EmailAddress)
     , submittedData : List (Result String FormData)
     }
 
@@ -87,7 +87,7 @@ init =
     , id =
         InputValidation.init "initial-id" idValidation
             |> InputValidation.detectChanges
-    , email = InputValidation.empty emailFieldValidation
+    , email = InputValidation.empty (Validation.String.optional emailFieldValidation)
     , submittedData = []
     }
 
@@ -117,14 +117,24 @@ parseForm =
         |> FormParser.input .email
 
 
+idFieldMask : String -> String
+idFieldMask =
+    String.replace " " "-"
+
+
+idUpdate : InputValidation.GeneralMsg customMsg -> InputValidation.Model data -> InputValidation.Model data
+idUpdate =
+    InputValidation.enhanceUpdateWithMask idFieldMask InputValidation.update
+
+
 update : Msg -> Model -> Model
 update msg model =
     case msg of
-        AgeInput subMsg ->
-            { model | age = InputValidation.update subMsg model.age }
-
         NameInput subMsg ->
             { model | name = InputValidation.update subMsg model.name }
+
+        AgeInput subMsg ->
+            { model | age = InputValidation.update subMsg model.age }
 
         DateInput subMsg ->
             { model | date = InputValidation.update subMsg model.date }
@@ -133,7 +143,7 @@ update msg model =
             { model | job = InputValidation.update subMsg model.job }
 
         IdInput subMsg ->
-            { model | id = InputValidation.update subMsg model.id }
+            { model | id = idUpdate subMsg model.id }
 
         EmailInput subMsg ->
             { model | email = InputValidation.update subMsg model.email }
@@ -224,6 +234,7 @@ encodeForm formData =
         , ( "date", Enc.string (Date.toIsoString formData.date) )
         , ( "job", nullable Enc.string formData.job )
         , ( "id", nullable Enc.string formData.id )
+        , ( "email", nullable (Email.toString >> Enc.string) formData.email )
         ]
 
 

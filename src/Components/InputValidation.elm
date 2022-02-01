@@ -5,6 +5,7 @@ module Components.InputValidation exposing
     , ValidationMessageStrategy
     , detectChanges
     , empty
+    , enhanceUpdateWithMask
     , getData
     , getValue
     , init
@@ -152,6 +153,16 @@ updateWithCustomStrategy strategy msg (Model model) =
 update : GeneralMsg customMsg -> Model data -> Model data
 update =
     updateWithCustomStrategy validateOnBlurStrategy
+
+
+enhanceUpdateWithMask : (String -> String) -> (GeneralMsg customMsg -> Model data -> Model data) -> GeneralMsg customMsg -> Model data -> Model data
+enhanceUpdateWithMask mask update_ msg model =
+    case msg of
+        Input str ->
+            update_ (Input (mask str)) model
+
+        _ ->
+            update_ msg model
 
 
 view : Model x -> List (Input.Attribute (GeneralMsg customMsg)) -> Html (GeneralMsg customMsg)
