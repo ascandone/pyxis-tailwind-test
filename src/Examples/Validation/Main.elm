@@ -80,8 +80,8 @@ init =
 
 
 type Msg
-    = AgeInputMsg InputValidation.Msg
-    | NameInputMsg InputValidation.Msg
+    = AgeInput InputValidation.Msg
+    | NameInput InputValidation.Msg
     | DateInput InputValidation.Msg
     | JobInput InputValidation.Msg
     | IdInput InputValidation.Msg
@@ -101,10 +101,10 @@ parseForm =
 update : Msg -> Model -> Model
 update msg model =
     case msg of
-        AgeInputMsg subMsg ->
+        AgeInput subMsg ->
             { model | age = InputValidation.update subMsg model.age }
 
-        NameInputMsg subMsg ->
+        NameInput subMsg ->
             { model | name = InputValidation.update subMsg model.name }
 
         DateInput subMsg ->
@@ -118,8 +118,8 @@ update msg model =
 
         Submit ->
             model
-                |> update (AgeInputMsg InputValidation.Submit)
-                |> update (NameInputMsg InputValidation.Submit)
+                |> update (AgeInput InputValidation.Submit)
+                |> update (NameInput InputValidation.Submit)
                 |> update (DateInput InputValidation.Submit)
                 |> update (JobInput InputValidation.Submit)
                 |> submitData
@@ -136,13 +136,13 @@ viewForm model =
             [ Input.placeholder "John Doe"
             , Input.label Label.vertical (Label.single "Name")
             ]
-            |> Html.map NameInputMsg
+            |> Html.map NameInput
         , InputValidation.view model.age
             [ Input.placeholder "Age"
             , Input.label Label.vertical (Label.double "Age" "At least 18 years old")
             , Input.type_ Input.number
             ]
-            |> Html.map AgeInputMsg
+            |> Html.map AgeInput
         , InputValidation.view model.date
             [ Input.label Label.vertical (Label.single "Birth date")
             , Input.type_ Input.date
