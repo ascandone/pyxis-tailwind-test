@@ -106,9 +106,17 @@ type alias ValidationMessageStrategy data customMsg =
     -> Maybe Bool
 
 
-updateWithCustomStrategy : ValidationMessageStrategy data customMsg -> GeneralMsg customMsg -> Model data -> Model data
-updateWithCustomStrategy strategy msg (Model model) =
+updateWithCustomStrategy :
+    ValidationMessageStrategy data customMsg
+    -> GeneralMsg customMsg
+    -> formModel
+    -> (formModel -> Model data)
+    -> Model data
+updateWithCustomStrategy strategy msg form getter =
     let
+        (Model model) =
+            getter form
+
         newModel =
             case msg of
                 Input str ->
@@ -150,13 +158,23 @@ updateWithCustomStrategy strategy msg (Model model) =
         }
 
 
-update : GeneralMsg customMsg -> Model data -> Model data
+update : GeneralMsg customMsg -> formModel -> (formModel -> Model data) -> Model data
 update =
     updateWithCustomStrategy validateOnBlurStrategy
 
 
-enhanceUpdateWithMask : (String -> Maybe String) -> (GeneralMsg customMsg -> Model data -> Model data) -> GeneralMsg customMsg -> Model data -> Model data
-enhanceUpdateWithMask mask update_ msg model =
+enhanceUpdateWithMask :
+    (String -> Maybe String)
+    -> (GeneralMsg customMsg -> formModel -> (formModel -> Model data) -> Model data)
+    -> GeneralMsg customMsg
+    -> formModel
+    -> (formModel -> Model data)
+    -> Model data
+enhanceUpdateWithMask mask update_ msg form getter =
+    let
+        model =
+            getter form
+    in
     case msg of
         Input str ->
             case mask str of
@@ -164,10 +182,10 @@ enhanceUpdateWithMask mask update_ msg model =
                     model
 
                 Just maskedStr ->
-                    update_ (Input maskedStr) model
+                    update_ (Input maskedStr) form getter
 
         _ ->
-            update_ msg model
+            update_ msg form getter
 
 
 view : Model x -> List (Input.Attribute (GeneralMsg customMsg)) -> Html (GeneralMsg customMsg)
