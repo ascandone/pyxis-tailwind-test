@@ -155,11 +155,16 @@ update =
     updateWithCustomStrategy validateOnBlurStrategy
 
 
-enhanceUpdateWithMask : (String -> String) -> (GeneralMsg customMsg -> Model data -> Model data) -> GeneralMsg customMsg -> Model data -> Model data
+enhanceUpdateWithMask : (String -> Maybe String) -> (GeneralMsg customMsg -> Model data -> Model data) -> GeneralMsg customMsg -> Model data -> Model data
 enhanceUpdateWithMask mask update_ msg model =
     case msg of
         Input str ->
-            update_ (Input (mask str)) model
+            case mask str of
+                Nothing ->
+                    model
+
+                Just maskedStr ->
+                    update_ (Input maskedStr) model
 
         _ ->
             update_ msg model

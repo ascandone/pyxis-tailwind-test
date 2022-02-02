@@ -128,12 +128,12 @@ parseForm =
         |> FormParser.input .email
 
 
-idFieldMask : String -> String
+idFieldMask : String -> Maybe String
 idFieldMask =
-    String.replace " " "-"
+    String.replace " " "-" >> Just
 
 
-idUpdate : InputValidation.GeneralMsg customMsg -> InputValidation.Model data -> InputValidation.Model data
+idUpdate : InputValidation.GeneralMsg x -> InputValidation.Model data -> InputValidation.Model data
 idUpdate =
     InputValidation.enhanceUpdateWithMask idFieldMask InputValidation.update
 
