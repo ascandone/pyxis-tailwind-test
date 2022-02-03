@@ -69,6 +69,7 @@ type alias FormData =
     , job : Maybe String
     , id : Maybe String
     , email : Maybe Email.EmailAddress
+    , password : String
     }
 
 
@@ -126,6 +127,7 @@ parseForm =
         |> FormParser.input .job
         |> FormParser.input .id
         |> FormParser.input .email
+        |> FormParser.input .confirmPassword
 
 
 idFieldMask : String -> Maybe String
@@ -138,8 +140,45 @@ idUpdate =
     InputValidation.enhanceUpdateWithMask idFieldMask InputValidation.update
 
 
+confirmPasswordMultiValidation : Model -> Result String ()
+confirmPasswordMultiValidation model =
+    InputValidation.multiValidation2
+        (\password confirmPassword ->
+            if password == confirmPassword then
+                Ok ()
+
+            else
+                Err "Passwords do not match"
+        )
+        model.password
+        model.confirmPassword
+
+
+afterUpdate : (Model -> Model) -> (Msg -> Model -> Model) -> Msg -> Model -> Model
+afterUpdate mapper update_ msg model =
+    let
+        newModel =
+            update_ msg model
+    in
+    mapper newModel
+
+
 update : Msg -> Model -> Model
-update msg model =
+update =
+    baseUpdate
+        |> afterUpdate
+            (\newModel ->
+                { newModel
+                    | confirmPassword =
+                        InputValidation.overrideValidation
+                            (confirmPasswordMultiValidation newModel)
+                            newModel.confirmPassword
+                }
+            )
+
+
+baseUpdate : Msg -> Model -> Model
+baseUpdate msg model =
     case msg of
         NameInput subMsg ->
             { model | name = InputValidation.update subMsg model.name }
@@ -167,14 +206,14 @@ update msg model =
 
         Submit ->
             model
-                |> update (AgeInput InputValidation.Submit)
-                |> update (NameInput InputValidation.Submit)
-                |> update (DateInput InputValidation.Submit)
-                |> update (JobInput InputValidation.Submit)
-                |> update (IdInput InputValidation.Submit)
-                |> update (EmailInput InputValidation.Submit)
-                |> update (PasswordInput InputValidation.Submit)
-                |> update (ConfirmPasswordInput InputValidation.Submit)
+                |> baseUpdate (AgeInput InputValidation.Submit)
+                |> baseUpdate (NameInput InputValidation.Submit)
+                |> baseUpdate (DateInput InputValidation.Submit)
+                |> baseUpdate (JobInput InputValidation.Submit)
+                |> baseUpdate (IdInput InputValidation.Submit)
+                |> baseUpdate (EmailInput InputValidation.Submit)
+                |> baseUpdate (PasswordInput InputValidation.Submit)
+                |> baseUpdate (ConfirmPasswordInput InputValidation.Submit)
                 |> submitData
 
 
@@ -228,12 +267,11 @@ viewForm model =
             , Input.type_ Input.password
             ]
             |> Html.map PasswordInput
-
-        -- , InputValidation.view model.confirmPassword
-        --     [ Input.label Label.vertical (Label.single "Confirm password")
-        --     , Input.type_ Input.password
-        --     ]
-        --     |> Html.map ConfirmPasswordInput
+        , InputValidation.view model.confirmPassword
+            [ Input.label Label.vertical (Label.single "Confirm password")
+            , Input.type_ Input.password
+            ]
+            |> Html.map ConfirmPasswordInput
         , Btn.primary
             [ Btn.size Btn.large
             , Btn.type_ Btn.submit
@@ -265,6 +303,7 @@ encodeForm formData =
         , ( "job", nullable Enc.string formData.job )
         , ( "id", nullable Enc.string formData.id )
         , ( "email", nullable (Email.toString >> Enc.string) formData.email )
+        , ( "password", Enc.string formData.password )
         ]
 
 

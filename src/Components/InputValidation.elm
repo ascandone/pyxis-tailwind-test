@@ -9,6 +9,8 @@ module Components.InputValidation exposing
     , getData
     , getValue
     , init
+    , multiValidation2
+    , overrideValidation
     , update
     , updateWithCustomStrategy
     , validate
@@ -45,6 +47,7 @@ type Model data
         , initialValue : String
         , validation : Validation String data
         , showValidation : Bool
+        , validationOverride : Result String ()
         }
 
 
@@ -56,6 +59,15 @@ init initialValue validation =
         , initialValue = initialValue
         , validation = validation
         , showValidation = False
+        , validationOverride = Ok ()
+        }
+
+
+overrideValidation : Result String x -> Model data -> Model data
+overrideValidation result (Model model) =
+    Model
+        { model
+            | validationOverride = Result.map (always ()) result
         }
 
 
@@ -74,6 +86,7 @@ detectChanges (Model model) =
         , value = model.value
         , showValidation = model.showValidation
         , initialValue = model.initialValue
+        , validationOverride = model.validationOverride
         , validation = validation
         }
 
@@ -89,13 +102,30 @@ getValue (Model { value }) =
 
 
 getData : Model data -> Maybe data
-getData (Model { validation, value }) =
-    Result.toMaybe (validation value)
+getData =
+    validate >> Result.toMaybe
 
 
 validate : Model data -> Result String data
-validate (Model { validation, value }) =
+validate (Model { validation, value, validationOverride }) =
+    Result.andThen (\() -> validation value) validationOverride
+
+
+{-| Internal implementation detail |
+-}
+validateBeforeOverride : Model data -> Result String data
+validateBeforeOverride (Model { validation, value }) =
     validation value
+
+
+multiValidation2 : (a -> b -> Result String ()) -> Model a -> Model b -> Result String ()
+multiValidation2 f m1 m2 =
+    case ( validateBeforeOverride m1, validateBeforeOverride m2 ) of
+        ( Ok v1, Ok v2 ) ->
+            f v1 v2
+
+        _ ->
+            Ok ()
 
 
 type alias ValidationMessageStrategy data customMsg =
@@ -187,11 +217,16 @@ view (Model model) attrs =
           , Input.onInput Input
           , Input.onBlur Blur
           , Input.onFocus Focus
-          , if model.showValidation then
-                Input.validation (model.validation model.value)
+          , case model.validationOverride of
+                Err msg ->
+                    Input.validation (Err msg)
 
-            else
-                Input.validation (Ok ())
+                Ok () ->
+                    if model.showValidation then
+                        Input.validation (model.validation model.value)
+
+                    else
+                        Input.validation (Ok ())
           ]
         ]
 
