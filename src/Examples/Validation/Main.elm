@@ -133,11 +133,7 @@ idFieldMask =
     String.replace " " "-" >> Just
 
 
-idUpdate :
-    InputValidation.GeneralMsg customMsg
-    -> formModel
-    -> (formModel -> InputValidation.Model data)
-    -> InputValidation.Model data
+idUpdate : InputValidation.GeneralMsg customMsg -> InputValidation.Model data -> InputValidation.Model data
 idUpdate =
     InputValidation.enhanceUpdateWithMask idFieldMask InputValidation.update
 
@@ -146,28 +142,28 @@ update : Msg -> Model -> Model
 update msg model =
     case msg of
         NameInput subMsg ->
-            { model | name = InputValidation.update subMsg model .name }
+            { model | name = InputValidation.update subMsg model.name }
 
         AgeInput subMsg ->
-            { model | age = InputValidation.update subMsg model .age }
+            { model | age = InputValidation.update subMsg model.age }
 
         DateInput subMsg ->
-            { model | date = InputValidation.update subMsg model .date }
+            { model | date = InputValidation.update subMsg model.date }
 
         JobInput subMsg ->
-            { model | job = InputValidation.update subMsg model .job }
+            { model | job = InputValidation.update subMsg model.job }
 
         IdInput subMsg ->
-            { model | id = idUpdate subMsg model .id }
+            { model | id = idUpdate subMsg model.id }
 
         EmailInput subMsg ->
-            { model | email = InputValidation.update subMsg model .email }
+            { model | email = InputValidation.update subMsg model.email }
 
         PasswordInput subMsg ->
-            { model | password = InputValidation.update subMsg model .password }
+            { model | password = InputValidation.update subMsg model.password }
 
         ConfirmPasswordInput subMsg ->
-            { model | confirmPassword = InputValidation.update subMsg model .confirmPassword }
+            { model | confirmPassword = InputValidation.update subMsg model.confirmPassword }
 
         Submit ->
             model
