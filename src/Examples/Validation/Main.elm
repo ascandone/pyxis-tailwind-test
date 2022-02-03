@@ -156,11 +156,7 @@ confirmPasswordMultiValidation model =
 
 afterUpdate : (Model -> Model) -> (Msg -> Model -> Model) -> Msg -> Model -> Model
 afterUpdate mapper update_ msg model =
-    let
-        newModel =
-            update_ msg model
-    in
-    mapper newModel
+    mapper (update_ msg model)
 
 
 update : Msg -> Model -> Model
