@@ -140,7 +140,7 @@ idUpdate =
     InputValidation.enhanceUpdateWithMask idFieldMask InputValidation.update
 
 
-confirmPasswordMultiValidation : Model -> Result String ()
+confirmPasswordMultiValidation : Validation Model ()
 confirmPasswordMultiValidation model =
     InputValidation.multiValidation2
         (\password confirmPassword ->
@@ -167,12 +167,12 @@ update : Msg -> Model -> Model
 update =
     baseUpdate
         |> afterUpdate
-            (\newModel ->
-                { newModel
+            (\model ->
+                { model
                     | confirmPassword =
                         InputValidation.overrideValidation
-                            (confirmPasswordMultiValidation newModel)
-                            newModel.confirmPassword
+                            (confirmPasswordMultiValidation model)
+                            model.confirmPassword
                 }
             )
 
